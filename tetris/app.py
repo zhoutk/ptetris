@@ -46,11 +46,16 @@ class App(object):
         cobox.pack(anchor="w")
         cobox["value"] = ("last", "one", "two", "three")
         cobox.current(0)
-        Button(frame, text = "PlayBack", height=1, width=12, command = (lambda x = ALL : self.game.delete(x))).pack(anchor="w")
+        Button(frame, text = "PlayBack", height=1, width=12, command = self.btnPlaybackClicked).pack(anchor="w")          #(lambda x = ALL : self.game.delete(x))).pack(anchor="w")
 
         self.game.focus()
 
 
     def btnStartClicked(self):
-        Block(self.game, 2, 1)
+        self.b = Block(self.game, 2, 1)
         print("start ... ")
+
+
+    def btnPlaybackClicked(self):
+        self.b.relocate(3, 4)
+        print("playback ... ")
