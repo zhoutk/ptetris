@@ -2,6 +2,7 @@
 from tkinter import *
 from tkinter import ttk
 import tkinter
+from tetris.block import *
 
 def start():
     root = Tk()
@@ -14,11 +15,11 @@ def start():
 
 class App(object):
     def __init__(self,object):
-        game = Canvas(object, bg='black', height=600, width=300)
-        game.place(x=15, y=10)
+        self.game = Canvas(object, bg='black', height=600, width=300)
+        self.game.place(x=15, y=10)
 
-        next = Canvas(object, bg='black', height=120, width=120)
-        next.place(x = 330, y = 10)
+        self.next = Canvas(object, bg='black', height=120, width=120)
+        self.next.place(x = 330, y = 10)
 
         frame = Frame(object)
         frame.place(x = 330, y = 160)
@@ -37,7 +38,7 @@ class App(object):
 
         Label(frame, text = "").pack(anchor="w")
         Checkbutton(frame, text = "AutoPlay").pack(anchor="w")
-        Button(frame, text = "Start", height=1, width=12).pack(anchor="w")
+        Button(frame, text = "Start", height=1, width=12, command=self.btnStartClicked).pack(anchor="w")
 
         Label(frame, text = "").pack(anchor="w")
         coboxVar = tkinter.StringVar
@@ -45,6 +46,11 @@ class App(object):
         cobox.pack(anchor="w")
         cobox["value"] = ("last", "one", "two", "three")
         cobox.current(0)
-        Button(frame, text = "PlayBack", height=1, width=12).pack(anchor="w")
+        Button(frame, text = "PlayBack", height=1, width=12, command = (lambda x = ALL : self.game.delete(x))).pack(anchor="w")
 
-        game.focus()
+        self.game.focus()
+
+
+    def btnStartClicked(self):
+        Block(self.game, 2, 1)
+        print("start ... ")
