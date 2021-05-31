@@ -1,4 +1,5 @@
 # -*- coding: UTF-8 -*-
+from tetris.tetris import Tetris
 from tkinter import *
 from tkinter import ttk
 import tkinter
@@ -50,12 +51,21 @@ class App:
 
         self.game.focus()
 
+        self.initx = 1
+        self.inity = 1
+
 
     def btnStartClicked(self):
-        self.b = Block(self.game, 2, 1)
+        self.initx = 1
+        self.inity = 1
+        if hasattr(self, 't'):
+            self.t.clean()
+        self.t = Tetris(self.game, 1, 1, 0, "white")
         print("start ... ")
 
 
     def btnPlaybackClicked(self):
-        self.b.relocate(3, 4)
+        self.initx += 1
+        self.inity += 1
+        self.t.relocate(self.initx, self.inity)
         print("playback ... ")
