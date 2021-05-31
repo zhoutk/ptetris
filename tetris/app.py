@@ -47,17 +47,26 @@ class App:
         cobox.pack(anchor="w")
         cobox["value"] = ("last", "one", "two", "three")
         cobox.current(0)
-        Button(frame, text = "PlayBack", height=1, width=10, command = self.btnPlaybackClicked).pack(anchor="w")          #(lambda x = ALL : self.game.delete(x))).pack(anchor="w")
+        cobox.bind("<<ComboboxSelected>>", self.comboxClicked)
+        self.cobox = cobox
+        Button(frame, text = "PlayBack", height=1, width=10, command = self.btnPlaybackClicked).pack(anchor="w")
 
-        self.game.focus()
+        self.game.bind(sequence="<Key>", func=self.processKeyboardEvent)
+        self.game.focus_set()
 
-        self.initx = 1
-        self.inity = 1
+
+    def processKeyboardEvent(self, ke):
+        if ke.keysym == 'Left':
+            self.t.moveLeft()
+        if ke.keysym == 'Right':
+            self.t.moveRight()
+        if ke.keysym == 'Up':
+            self.t.moveUp()
+        if ke.keysym == 'Down':
+            self.t.moveDown()
 
 
     def btnStartClicked(self):
-        self.initx = 1
-        self.inity = 1
         if hasattr(self, 't'):
             self.t.clean()
         self.t = Tetris(self.game, 1, 1, 0, "white")
@@ -65,7 +74,10 @@ class App:
 
 
     def btnPlaybackClicked(self):
-        self.initx += 1
-        self.inity += 1
-        self.t.relocate(self.initx, self.inity)
         print("playback ... ")
+
+
+    def comboxClicked(self, event):
+        print(self.cobox.get())
+        print("combobox ... ")
+        self.game.focus_set()

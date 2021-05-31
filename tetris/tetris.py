@@ -20,6 +20,22 @@ class Tetris:
                 self.data[1 + i // TETRISDIMENSION][i % TETRISDIMENSION] = 1
                 self.objs.append(Block(canvas, self.x + i % TETRISDIMENSION, self.y + 1 + i // TETRISDIMENSION, color))
 
+
+    def moveLeft(self):
+        self.relocate(self.x - 1, self.y)
+
+
+    def moveRight(self):
+        self.relocate(self.x + 1, self.y)
+
+
+    def moveUp(self):
+        self.relocate(self.x, self.y - 1)
+
+
+    def moveDown(self):
+        self.relocate(self.x, self.y + 1)
+
         
     def relocate(self, x, y):
         for block in self.objs:
