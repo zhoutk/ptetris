@@ -4,6 +4,7 @@ from tkinter import *
 from tkinter import ttk
 import tkinter
 from tetris.block import *
+import random
 
 def start():
     root = Tk()
@@ -61,7 +62,7 @@ class App:
         if ke.keysym == 'Right':
             self.t.moveRight()
         if ke.keysym == 'Up':
-            self.t.moveUp()
+            self.t.rotate()
         if ke.keysym == 'Down':
             self.t.moveDown()
 
@@ -69,8 +70,9 @@ class App:
     def btnStartClicked(self):
         if hasattr(self, 't'):
             self.t.clean()
-        self.t = Tetris(self.game, 1, 1, 0, "red")
-        print("start ... ")
+        shape = random.randint(0,6)
+        self.t = Tetris(self.game, 1, 1, shape, "red")
+        print("start ... ", shape)
         self.game.focus_set()
 
 
