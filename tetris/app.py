@@ -1,4 +1,5 @@
 # -*- coding: UTF-8 -*-
+from tetris.game import Game
 from tetris.tetris import Tetris
 from tkinter import *
 from tkinter import ttk
@@ -17,8 +18,8 @@ def start():
 
 class App:
     def __init__(self,root):
-        self.game = Canvas(root, bg='black', height=600 + CANVASOFFSET * 2, width=300 + CANVASOFFSET * 2)
-        self.game.place(x=12, y=10)
+        self.gameCanvas = Canvas(root, bg='black', height=600 + CANVASOFFSET * 2, width=300 + CANVASOFFSET * 2)
+        self.gameCanvas.place(x=12, y=10)
 
         self.next = Canvas(root, bg='black', height=120 + CANVASOFFSET * 2, width=120 + CANVASOFFSET * 2)
         self.next.place(x = 330, y = 10)
@@ -52,8 +53,8 @@ class App:
         self.cobox = cobox
         Button(frame, text = "PlayBack", height=1, width=10, command = self.btnPlaybackClicked).pack(anchor="w")
 
-        self.game.bind(sequence="<Key>", func=self.processKeyboardEvent)
-        self.game.focus_set()
+        self.gameCanvas.bind(sequence="<Key>", func=self.processKeyboardEvent)
+        self.gameCanvas.focus_set()
 
 
     def processKeyboardEvent(self, ke):
@@ -71,17 +72,18 @@ class App:
         if hasattr(self, 't'):
             self.t.clean()
         shape = random.randint(0,6)
-        self.t = Tetris(self.game, 1, 1, shape, "red")
+        self.t = Tetris(self.gameCanvas, 1, 1, shape, "red")
         print("start ... ", shape)
-        self.game.focus_set()
+        self.game = Game(self.gameCanvas)
+        self.gameCanvas.focus_set()
 
 
     def btnPlaybackClicked(self):
         print("playback ... ")
-        self.game.focus_set()
+        self.gameCanvas.focus_set()
 
 
     def comboxClicked(self, event):
         print(self.cobox.get())
         print("combobox ... ")
-        self.game.focus_set()
+        self.gameCanvas.focus_set()
