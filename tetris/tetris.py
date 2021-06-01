@@ -36,11 +36,15 @@ class Tetris:
         self.relocate(self.x, self.y + 1)
 
     def rotate(self):
-        for i in range(len(self.data)):
-            for j in range(i+1, len(self.data)):
-                temp = self.data[i][j]
-                self.data[i][j] = self.data[j][i]
-                self.data[j][i] = temp
+        for i in range(TETRISDIMENSION // 2):
+            lenJ = TETRISDIMENSION - i - 1
+            for j in range(i, lenJ):
+                lenI = TETRISDIMENSION - j - 1
+                t = self.data[i][j]
+                self.data[i][j] = self.data[lenI][i]
+                self.data[lenI][i] = self.data[lenJ][lenI]
+                self.data[lenJ][lenI] = self.data[j][lenJ]
+                self.data[j][lenJ] = t
         self.rotateCount += 1
         self.clean()
         for i in range(TETRISDIMENSION):
