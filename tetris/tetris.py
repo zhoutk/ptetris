@@ -46,12 +46,14 @@ class Tetris:
                 self.data[lenJ][lenI] = self.data[j][lenJ]
                 self.data[j][lenJ] = t
         self.rotateCount += 1
+        self.redraw()
+
+    def redraw(self):
         self.clean()
         for i in range(TETRISDIMENSION):
             for j in range(TETRISDIMENSION):
                 if self.data[i][j]:
                     self.objs.append(Block(self.canvas, self.x + j, self.y + i, self.color))
-
 
     def relocate(self, x, y):
         for block in self.objs:
