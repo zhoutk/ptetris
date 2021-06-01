@@ -16,10 +16,10 @@ def start():
 
 class App:
     def __init__(self,root):
-        self.game = Canvas(root, bg='black', height=600, width=300)
+        self.game = Canvas(root, bg='black', height=600 + CANVASOFFSET, width=300 + CANVASOFFSET)
         self.game.place(x=12, y=10)
 
-        self.next = Canvas(root, bg='black', height=120, width=120)
+        self.next = Canvas(root, bg='black', height=120 + CANVASOFFSET, width=120 + CANVASOFFSET)
         self.next.place(x = 330, y = 10)
 
         frame = Frame(root)
@@ -69,12 +69,14 @@ class App:
     def btnStartClicked(self):
         if hasattr(self, 't'):
             self.t.clean()
-        self.t = Tetris(self.game, 1, 1, 0, "white")
+        self.t = Tetris(self.game, 1, 1, 0, "red")
         print("start ... ")
+        self.game.focus_set()
 
 
     def btnPlaybackClicked(self):
         print("playback ... ")
+        self.game.focus_set()
 
 
     def comboxClicked(self, event):

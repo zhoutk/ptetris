@@ -6,7 +6,7 @@ class Block:
         self.canvas = canvas
         self.x = x
         self.y = y
-        self.obj = canvas.create_rectangle((x - 1) * BLOCKSIDEWIDTH, (y - 1) * BLOCKSIDEWIDTH, x * BLOCKSIDEWIDTH, y * BLOCKSIDEWIDTH, fill = color)
+        self.obj = canvas.create_rectangle((x - 1) * BLOCKSIDEWIDTH + CANVASOFFSET, (y - 1) * BLOCKSIDEWIDTH + CANVASOFFSET, x * BLOCKSIDEWIDTH + CANVASOFFSET, y * BLOCKSIDEWIDTH + CANVASOFFSET, fill = color, outline = "yellow")
 
 
     def relocate(self, detaX, detaY):
