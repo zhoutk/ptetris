@@ -17,10 +17,10 @@ def start():
 
 class App:
     def __init__(self,root):
-        self.game = Canvas(root, bg='black', height=600 + CANVASOFFSET, width=300 + CANVASOFFSET)
+        self.game = Canvas(root, bg='black', height=600 + CANVASOFFSET * 2, width=300 + CANVASOFFSET * 2)
         self.game.place(x=12, y=10)
 
-        self.next = Canvas(root, bg='black', height=120 + CANVASOFFSET, width=120 + CANVASOFFSET)
+        self.next = Canvas(root, bg='black', height=120 + CANVASOFFSET * 2, width=120 + CANVASOFFSET * 2)
         self.next.place(x = 330, y = 10)
 
         frame = Frame(root)
