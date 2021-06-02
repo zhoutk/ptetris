@@ -32,6 +32,8 @@ class Game:
 
         self.nextCanvas.delete(ALL)
         self.nextTetris = Tetris(self.nextCanvas, 1, 1, random.randint(0,6))
+        for i in range(random.randint(0,4)):
+            self.nextTetris.rotate()
 
     def moveLeft(self):
         self.tetris.moveLeft()
