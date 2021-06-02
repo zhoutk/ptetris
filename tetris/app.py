@@ -19,8 +19,8 @@ class App:
         self.gameCanvas = Canvas(root, bg='black', height=600 + CANVASOFFSET * 2, width=300 + CANVASOFFSET * 2)
         self.gameCanvas.place(x=12, y=10)
 
-        self.next = Canvas(root, bg='black', height=120 + CANVASOFFSET * 2, width=120 + CANVASOFFSET * 2)
-        self.next.place(x = 330, y = 10)
+        self.nextCanvas = Canvas(root, bg='black', height=120 + CANVASOFFSET * 2, width=120 + CANVASOFFSET * 2)
+        self.nextCanvas.place(x = 330, y = 10)
 
         frame = Frame(root)
         frame.place(x = 330, y = 160)
@@ -52,7 +52,7 @@ class App:
         Button(frame, text = "PlayBack", height=1, width=10, command = self.btnPlaybackClicked).pack(anchor="w")
 
         self.gameCanvas.bind(sequence="<Key>", func=self.processKeyboardEvent)
-        self.game = Game(self.gameCanvas, self.next)
+        self.game = Game(self.gameCanvas, self.nextCanvas)
         self.gameCanvas.focus_set()
 
 

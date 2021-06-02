@@ -2,7 +2,7 @@ import uuid
 
 TETRISDIMENSION = 4
 BLOCKSIDEWIDTH = 30
-CANVASOFFSET = 2
+CANVASOFFSET = 4
 TETRISAHPES = (
     (1, 1, 1, 1),
     (0, 1, 1, 1, 0, 1),

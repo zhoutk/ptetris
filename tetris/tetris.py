@@ -23,6 +23,14 @@ class Tetris:
                 self.data[1 + i // TETRISDIMENSION][i % TETRISDIMENSION] = 1
                 self.objs.append(Block(canvas, self.x + i % TETRISDIMENSION, self.y + 1 + i // TETRISDIMENSION, color))
     
+    def hasBlock(self, x, y):
+        if x < 1 or x > 10 or y > 20:
+            return True
+        if GameRoom[y][x] == 1:
+            return True
+        else:
+            return False
+    
     def canPlace(self, x, y):
         for i in range(TETRISDIMENSION):
             for j in range(TETRISDIMENSION):
@@ -50,6 +58,15 @@ class Tetris:
             lenJ = TETRISDIMENSION - i - 1
             for j in range(i, lenJ):
                 lenI = TETRISDIMENSION - j - 1
+                if self.data[i][j] and self.hasBlock(self.x + lenJ, self.y + j) or \
+                    self.data[lenI][i] and self.hasBlock(self.x + j, self.y + i) or \
+                    self.data[lenJ][lenI] and self.hasBlock(self.x + i, self.y + lenI) or \
+                    self.data[j][lenJ] and self.hasBlock(self.x + lenI, self.y + lenJ):
+                    return False
+        for i in range(TETRISDIMENSION // 2):
+            lenJ = TETRISDIMENSION - i - 1
+            for j in range(i, lenJ):
+                lenI = TETRISDIMENSION - j - 1
                 t = self.data[i][j]
                 self.data[i][j] = self.data[lenI][i]
                 self.data[lenI][i] = self.data[lenJ][lenI]
@@ -57,6 +74,7 @@ class Tetris:
                 self.data[j][lenJ] = t
         self.rotateCount += 1
         self.redraw()
+        return True
 
     def redraw(self):
         self.clean()
