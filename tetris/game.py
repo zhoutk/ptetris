@@ -26,6 +26,8 @@ class Game:
             self.nextTetris.rotate()
 
     def generateNext(self):
+        levelCount = self.clearRows()
+        
         self.tetris = Tetris(self.canvas, 4, 0, self.nextTetris.getTetrisShape())
         for i in range(self.nextTetris.getRotateCount()):
             self.tetris.rotate()
@@ -34,6 +36,9 @@ class Game:
         self.nextTetris = Tetris(self.nextCanvas, 1, 1, random.randint(0,6))
         for i in range(random.randint(0,4)):
             self.nextTetris.rotate()
+
+    def clearRows(self):
+        return 1
 
     def moveLeft(self):
         self.tetris.moveLeft()
