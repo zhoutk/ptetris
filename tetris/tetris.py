@@ -22,18 +22,28 @@ class Tetris:
             if b:
                 self.data[1 + i // TETRISDIMENSION][i % TETRISDIMENSION] = 1
                 self.objs.append(Block(canvas, self.x + i % TETRISDIMENSION, self.y + 1 + i // TETRISDIMENSION, color))
+    
+    def canPlace(self, x, y):
+        for i in range(TETRISDIMENSION):
+            for j in range(TETRISDIMENSION):
+                if self.data[i][j] and GameRoom[y + i][x + j]:
+                    return False
+        return True
 
     def moveLeft(self):
-        self.relocate(self.x - 1, self.y)
+        if self.canPlace(self.x - 1, self.y):
+            self.relocate(self.x - 1, self.y)
 
     def moveRight(self):
-        self.relocate(self.x + 1, self.y)
+        if self.canPlace(self.x + 1, self.y):
+            self.relocate(self.x + 1, self.y)
 
     def moveUp(self):
         self.relocate(self.x, self.y - 1)
 
     def moveDown(self):
-        self.relocate(self.x, self.y + 1)
+        if self.canPlace(self.x, self.y + 1):
+            self.relocate(self.x, self.y + 1)
 
     def rotate(self):
         for i in range(TETRISDIMENSION // 2):

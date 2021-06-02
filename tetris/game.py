@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 from tkinter.constants import ALL
-from  tetris.config import UID
+from  tetris.config import UID, initGameRoom
 from tetris.tetris import Tetris
 import random
 
@@ -11,12 +11,7 @@ class Game:
         self.nextCanvas = nextCanvas
         self.tetris = None
         self.nextTetris = None
-        self.gameRoom = [[0 for i in range(12)] for i in range(22)]
-        for i in range(22):
-            self.gameRoom[i][0] = 1
-            self.gameRoom[i][11] = 1
-        for i in range(1, 12):
-            self.gameRoom[21][i] = 1
+        initGameRoom()
 
     def start(self):
         self.canvas.delete(ALL)
