@@ -1,11 +1,9 @@
 # -*- coding: UTF-8 -*-
 from tetris.game import Game
-from tetris.tetris import Tetris
 from tkinter import *
 from tkinter import ttk
 import tkinter
 from tetris.block import *
-import random
 
 def start():
     root = Tk()
@@ -54,28 +52,24 @@ class App:
         Button(frame, text = "PlayBack", height=1, width=10, command = self.btnPlaybackClicked).pack(anchor="w")
 
         self.gameCanvas.bind(sequence="<Key>", func=self.processKeyboardEvent)
+        self.game = Game(self.gameCanvas, self.next)
         self.gameCanvas.focus_set()
 
 
     def processKeyboardEvent(self, ke):
         if ke.keysym == 'Left':
-            self.t.moveLeft()
+            self.game.moveLeft()
         if ke.keysym == 'Right':
-            self.t.moveRight()
+            self.game.moveRight()
         if ke.keysym == 'Up':
-            self.t.rotate()
+            self.game.rotate()
         if ke.keysym == 'Down':
-            self.t.moveDown()
+            self.game.moveDown()
 
 
     def btnStartClicked(self):
-        if hasattr(self, 't'):
-            self.t.clean()
-        shape = random.randint(0,6)
-        self.t = Tetris(self.gameCanvas, 1, 1, shape, "red")
-        print("start ... ", shape)
-        self.game = Game(self.gameCanvas)
-        self.gameCanvas.focus_set()
+        print("start ... ")
+        self.game.start()
 
 
     def btnPlaybackClicked(self):
