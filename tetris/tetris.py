@@ -4,14 +4,14 @@ from tetris.block import *
 
 
 class Tetris:
-    def __init__(self, canvas, x, y, shape, color="red"):
+    def __init__(self, canvas, x, y, shape):
         self.x = x
         self.y = y
         self.canvas = canvas
         self.objs = []
         self.rotateCount = 0
         self.shape = shape
-        self.color = color
+        self.color = TETRISCOLORS[shape]
         self.data = [
             [0, 0, 0, 0],
             [0, 0, 0, 0],
@@ -22,7 +22,7 @@ class Tetris:
         for i, b in enumerate(curShape):
             if b:
                 self.data[1 + i // TETRISDIMENSION][i % TETRISDIMENSION] = 1
-                self.objs.append(Block(canvas, self.x + i % TETRISDIMENSION, self.y + 1 + i // TETRISDIMENSION, color))
+                self.objs.append(Block(canvas, self.x + i % TETRISDIMENSION, self.y + 1 + i // TETRISDIMENSION, self.color))
 
     def getTetrisShape(self):
         return self.shape

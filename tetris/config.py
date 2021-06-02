@@ -13,6 +13,16 @@ TETRISAHPES = (
     (0, 1, 0, 0, 1, 1, 1)
 )
 
+TETRISCOLORS = (
+    "red",
+    "magenta",
+    "darkMagenta",
+    "gray",
+    "darkGreen",
+    "darkCyan",
+    "darkBlue"
+)
+
 GameRoom = [[0 for i in range(12)] for i in range(22)]
 
 def initGameRoom():
