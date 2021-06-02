@@ -10,6 +10,7 @@ class Tetris:
         self.canvas = canvas
         self.objs = []
         self.rotateCount = 0
+        self.shape = shape
         self.color = color
         self.data = [
             [0, 0, 0, 0],
@@ -22,6 +23,12 @@ class Tetris:
             if b:
                 self.data[1 + i // TETRISDIMENSION][i % TETRISDIMENSION] = 1
                 self.objs.append(Block(canvas, self.x + i % TETRISDIMENSION, self.y + 1 + i // TETRISDIMENSION, color))
+
+    def getTetrisShape(self):
+        return self.shape
+
+    def getRotateCount(self):
+        return self.rotateCount
     
     def hasBlock(self, x, y):
         if x < 1 or x > 10 or y > 20:
@@ -52,6 +59,13 @@ class Tetris:
     def moveDown(self):
         if self.canPlace(self.x, self.y + 1):
             self.relocate(self.x, self.y + 1)
+            return True
+        else:
+            for i in range(TETRISDIMENSION):
+                for j in range(TETRISDIMENSION):
+                    if self.data[i][j]:
+                        GameRoom[self.y + i][self.x + j] = 1
+            return False
 
     def rotate(self):
         for i in range(TETRISDIMENSION // 2):

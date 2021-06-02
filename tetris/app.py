@@ -57,6 +57,7 @@ class App:
 
 
     def processKeyboardEvent(self, ke):
+        # print(ke.keysym)
         if ke.keysym == 'Left':
             self.game.moveLeft()
         if ke.keysym == 'Right':
@@ -65,6 +66,8 @@ class App:
             self.game.rotate()
         if ke.keysym == 'Down':
             self.game.moveDown()
+        if ke.keysym == 'space':
+            self.game.moveDownEnd()
 
 
     def btnStartClicked(self):
