@@ -4,15 +4,24 @@ from tkinter.constants import ALL
 from  tetris.config import *
 from tetris.tetris import Tetris
 import random
+from threading import Timer
 
 class Game:
-    def __init__(self, canvas, nextCanvas) -> None:
+    def __init__(self, canvas, nextCanvas, app = None) -> None:
+        self.app = app
+        self.gameRunningStatus = 0
         self.canvas = canvas
         self.nextCanvas = nextCanvas
         self.tetris = None
         self.nextTetris = None
 
     def start(self):
+        self.gameRunningStatus = 1
+        self.gameSpeedInterval = 1000
+        self.gameSpeed = 1
+        self.gameLevels = 0
+        self.gameScores = 0
+        self.app.updateGameInfo(1,0,0)
         self.canvas.delete(ALL)
         self.nextCanvas.delete(ALL)
         initGameRoom()
@@ -25,12 +34,32 @@ class Game:
         for i in range(random.randint(0,4)):
             self.nextTetris.rotate()
 
+        self.tick = Timer(self.gameSpeedInterval / 1000, self.tickoff)
+        self.tick.start()
+        
+
+    def tickoff(self):
+        print("interval value : ", self.gameSpeedInterval)
+        if self.gameRunningStatus == 1:
+            self.moveDown()
+            self.tick = Timer(self.gameSpeedInterval / 1000, self.tickoff)
+            self.tick.start()
+
+
     def generateNext(self):
         cleanLevels = self.clearRows()
+        if cleanLevels > 0:
+            self.gameLevels += cleanLevels
+            self.gameScores += SCORES[cleanLevels]
+            if self.gameScores / STEPUPSCORE >= self.gameSpeed:
+                self.gameSpeed += 1
+                self.gameSpeedInterval -= STEPUPINTERVAL
+            self.app.updateGameInfo(self.gameSpeed, self.gameLevels, self.gameScores)
         
         self.tetris = Tetris(self.canvas, 4, 0, self.nextTetris.getTetrisShape())
         for i in range(self.nextTetris.getRotateCount()):
-            self.tetris.rotate()
+            if not self.tetris.rotate():
+                break
 
         if self.tetris.canPlace(4, 0):
             self.nextCanvas.delete(ALL)
@@ -38,7 +67,12 @@ class Game:
             for i in range(random.randint(0,4)):
                 self.nextTetris.rotate()
         else:
+            self.gameRunningStatus = 0
             self.canvas.create_text(150, 200, text = "Game is over!", fill="white", font = "Times 28 italic bold")
+            print("game is over!")
+
+    def getGameRunningStatus(self):
+        return self.gameRunningStatus
 
     def clearRows(self):
         occupyLines = []

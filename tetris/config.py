@@ -24,6 +24,11 @@ TETRISCOLORS = (
     "darkBlue"
 )
 
+SCORES = (0,1,3,7,10)
+
+STEPUPSCORE = 50
+STEPUPINTERVAL = 100
+
 GameRoom = [[0 for i in range(12)] for i in range(22)]
 
 def initGameRoom():
