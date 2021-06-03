@@ -73,7 +73,7 @@ class Game:
                         GameRoom[h][j] = 0
                         for b in self.canvas.find_closest(j * BLOCKSIDEWIDTH - HALFBLOCKWIDTH, h  * BLOCKSIDEWIDTH - HALFBLOCKWIDTH):
                             self.canvas.move(b, 0, index * BLOCKSIDEWIDTH)
-                if count == 10:
+                if count == 0:
                     break
             h -= 1
 
