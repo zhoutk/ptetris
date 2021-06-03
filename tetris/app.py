@@ -100,5 +100,5 @@ class App:
 
     def rootClose(self, root):
         print("timer close.")
-        self.game.tick.cancel()
+        # self.game.tick.cancel()
         root.quit()

@@ -34,12 +34,12 @@ class Game:
         for i in range(random.randint(0,4)):
             self.nextTetris.rotate()
 
-        self.tick = Timer(self.gameSpeedInterval / 1000, self.tickoff)
-        self.tick.start()
+        # self.tick = Timer(self.gameSpeedInterval / 1000, self.tickoff)
+        # self.tick.start()
         
 
     def tickoff(self):
-        print("interval value : ", self.gameSpeedInterval)
+        # print("interval value : ", self.gameSpeedInterval)
         if self.gameRunningStatus == 1:
             self.moveDown()
             self.tick = Timer(self.gameSpeedInterval / 1000, self.tickoff)
@@ -85,16 +85,16 @@ class Game:
             if allOccupy == 10:
                 occupyLines.append(h)
             elif allOccupy == 0:
-                if len(occupyLines) > 0:
-                    self.doCleanRows(occupyLines)
                 break
             h -= 1
+        if len(occupyLines) > 0:
+            self.doCleanRows(occupyLines)
         return len(occupyLines)
 
     def doCleanRows(self, lines):
         index = 0
         h = lines[index]
-        while h > 0:
+        while h >= 0:
             if index < len(lines) and h == lines[index]:
                 index += 1
                 for j in range(1, 11):
