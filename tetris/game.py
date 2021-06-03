@@ -32,10 +32,13 @@ class Game:
         for i in range(self.nextTetris.getRotateCount()):
             self.tetris.rotate()
 
-        self.nextCanvas.delete(ALL)
-        self.nextTetris = Tetris(self.nextCanvas, 1, 1, random.randint(0,6))
-        for i in range(random.randint(0,4)):
-            self.nextTetris.rotate()
+        if self.tetris.canPlace(4, 0):
+            self.nextCanvas.delete(ALL)
+            self.nextTetris = Tetris(self.nextCanvas, 1, 1, random.randint(0,6))
+            for i in range(random.randint(0,4)):
+                self.nextTetris.rotate()
+        else:
+            self.canvas.create_text(150, 200, text = "Game is over!", fill="white", font = "Times 28 italic bold")
 
     def clearRows(self):
         occupyLines = []
