@@ -65,8 +65,8 @@ class Game:
                     for b in self.canvas.find_closest(j * BLOCKSIDEWIDTH - HALFBLOCKWIDTH, h  * BLOCKSIDEWIDTH - HALFBLOCKWIDTH):
                         self.canvas.delete(b)
             else:
+                count = 0
                 for j in range(1, 11):
-                    count = 0
                     if GameRoom[h][j] == 1:
                         count += 1
                         GameRoom[h + index][j] = GameRoom[h][j]
