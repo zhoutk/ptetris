@@ -1,4 +1,7 @@
 import uuid
+import threading
+
+curTetrisLock = threading.Lock()
 
 TETRISDIMENSION = 4
 BLOCKSIDEWIDTH = 30

@@ -34,12 +34,11 @@ class Game:
         for i in range(random.randint(0,4)):
             self.nextTetris.rotate()
 
-        # self.tick = Timer(self.gameSpeedInterval / 1000, self.tickoff)
-        # self.tick.start()
+        self.tick = Timer(self.gameSpeedInterval / 1000, self.tickoff)
+        self.tick.start()
         
 
     def tickoff(self):
-        # print("interval value : ", self.gameSpeedInterval)
         if self.gameRunningStatus == 1:
             self.moveDown()
             self.tick = Timer(self.gameSpeedInterval / 1000, self.tickoff)
@@ -121,10 +120,13 @@ class Game:
         self.tetris.moveRight()
 
     def moveDown(self):
+        curTetrisLock.acquire()
         if not self.tetris.moveDown():
             self.generateNext()
+            curTetrisLock.release()
             return False
         else:
+            curTetrisLock.release()
             return True
 
     def moveDownEnd(self):
