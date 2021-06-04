@@ -10,5 +10,5 @@ PTetris is a realization of Tetris game use python.
 
 This project surpport windows, linux, macOs
 
-on linux, you must install tkinter first, use this command:
+on linux, you must install tkinter first, use this command:  
 sudo apt install python3-tk
