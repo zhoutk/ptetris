@@ -1,13 +1,12 @@
-PTetris
-=====
+## PTetris
 
 PTetris is a realization of Tetris game use python.
 
-run method
-#. install python3, git
-#. git clone https://gitee.com/zhoutk/ptetris (or download and unzip source code)
-#. cd ptetris
-#. python3 tetris
+### run method
+1. install python3, git
+2. git clone https://gitee.com/zhoutk/ptetris (or download and unzip source code)
+3. cd ptetris
+4. python3 tetris
 
 This project surpport windows, linux, macOs
 
