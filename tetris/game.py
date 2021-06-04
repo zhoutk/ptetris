@@ -36,7 +36,15 @@ class Game:
 
         self.tick = Timer(self.gameSpeedInterval / 1000, self.tickoff)
         self.tick.start()
-        
+
+
+    def pause(self):
+        self.gameRunningStatus = 5
+
+    def resume(self):
+        self.gameRunningStatus = 1  
+        self.tick = Timer(self.gameSpeedInterval / 1000, self.tickoff)
+        self.tick.start()      
 
     def tickoff(self):
         if self.gameRunningStatus == 1:

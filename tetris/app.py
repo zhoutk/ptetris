@@ -44,7 +44,9 @@ class App:
 
         Label(frame, text = "").pack(anchor="w")
         Checkbutton(frame, text = "AutoPlay").pack(anchor="w")
-        Button(frame, text = "Start", height=1, width=10, command=self.btnStartClicked).pack(anchor="w")
+        self.btnStartVar = tkinter.StringVar()
+        self.btnStartVar.set("Start")
+        Button(frame, height=1, width=10, command=self.btnStartClicked, textvariable=self.btnStartVar).pack(anchor="w")
 
         Label(frame, text = "").pack(anchor="w")
         coboxVar = tkinter.StringVar()
@@ -83,8 +85,15 @@ class App:
 
 
     def btnStartClicked(self):
-        print("start ... ")
-        self.game.start()
+        if self.game.getGameRunningStatus() == 0:
+            self.btnStartVar.set("Pause")
+            self.game.start()
+        elif self.game.getGameRunningStatus() == 1:
+            self.btnStartVar.set("Resume")
+            self.game.pause()
+        elif self.game.getGameRunningStatus() == 5:
+            self.btnStartVar.set("Pause")
+            self.game.resume()
 
 
     def btnPlaybackClicked(self):
