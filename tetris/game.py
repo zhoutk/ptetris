@@ -120,14 +120,16 @@ class Game:
         self.tetris.moveRight()
 
     def moveDown(self):
+        rs = True
         curTetrisLock.acquire()
-        if not self.tetris.moveDown():
-            self.generateNext()
+        try:
+            if not self.tetris.moveDown():
+                self.generateNext()
+                rs = False
+        finally:
             curTetrisLock.release()
-            return False
-        else:
-            curTetrisLock.release()
-            return True
+        return rs
+
 
     def moveDownEnd(self):
         while self.moveDown():
