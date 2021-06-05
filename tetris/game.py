@@ -47,9 +47,13 @@ class Game:
         self.tick.start()      
 
     def tickoff(self):
-        # pass
         if self.gameRunningStatus == 1:
-            self.moveDown()
+            if not tickLock[0]:
+                with curTetrisLock:
+                    tickLock[1] += 1
+                    print("------------------ get lock", tickLock[1])
+                    self.moveDown()
+                    print("================== lose lock", tickLock[1])
             self.tick = Timer(self.gameSpeedInterval / 1000, self.tickoff)
             self.tick.start()
 

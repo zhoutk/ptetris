@@ -2,6 +2,7 @@ import uuid
 import threading
 
 curTetrisLock = threading.Lock()
+tickLock = [False, 0, 0]
 
 TETRISDIMENSION = 4
 BLOCKSIDEWIDTH = 30
