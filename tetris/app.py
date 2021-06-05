@@ -83,6 +83,8 @@ class App:
         self.scoresVar.set(scores)
         print("update game infomation.")
 
+    def setStartButtonText(self, text):
+        self.btnStartVar.set(text)
 
     def btnStartClicked(self):
         if self.game.getGameRunningStatus() == 0:
@@ -109,5 +111,6 @@ class App:
 
     def rootClose(self, root):
         print("timer close.")
-        self.game.tick.cancel()
+        if hasattr(self.game, "tick"):
+            self.game.tick.cancel()
         root.quit()

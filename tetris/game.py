@@ -47,6 +47,7 @@ class Game:
         self.tick.start()      
 
     def tickoff(self):
+        # pass
         if self.gameRunningStatus == 1:
             self.moveDown()
             self.tick = Timer(self.gameSpeedInterval / 1000, self.tickoff)
@@ -62,12 +63,10 @@ class Game:
                 self.gameSpeed += 1
                 self.gameSpeedInterval -= STEPUPINTERVAL
             self.app.updateGameInfo(self.gameSpeed, self.gameLevels, self.gameScores)
-        
         self.tetris = Tetris(self.canvas, 4, 0, self.nextTetris.getTetrisShape())
         for i in range(self.nextTetris.getRotateCount()):
             if not self.tetris.rotate():
                 break
-
         if self.tetris.canPlace(4, 0):
             self.nextCanvas.delete(ALL)
             self.nextTetris = Tetris(self.nextCanvas, 1, 1, random.randint(0,6))
@@ -76,6 +75,7 @@ class Game:
         else:
             self.gameRunningStatus = 0
             self.canvas.create_text(150, 200, text = "Game is over!", fill="white", font = "Times 28 italic bold")
+            self.app.setStartButtonText("Start")
             print("game is over!")
 
     def getGameRunningStatus(self):
@@ -129,13 +129,9 @@ class Game:
 
     def moveDown(self):
         rs = True
-        curTetrisLock.acquire()
-        try:
-            if not self.tetris.moveDown():
-                self.generateNext()
-                rs = False
-        finally:
-            curTetrisLock.release()
+        if not self.tetris.moveDown():
+            self.generateNext()
+            rs = False
         return rs
 
 
