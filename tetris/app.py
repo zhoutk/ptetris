@@ -51,7 +51,7 @@ class App:
         Button(frame, height=1, width=10, command=self.btnStartClicked, textvariable=self.btnStartVar).pack(anchor="w")
 
         Label(frame, text = "").pack(anchor="w")
-        coboxVar = tkinter.StringVar()
+        coboxVar = tkinter.StringVar
         cobox = ttk.Combobox(frame, textvariable=coboxVar, height=5, width=8, state="readonly")
         cobox.pack(anchor="w")
         cobox["value"] = ("last", "one", "two", "three")
@@ -116,5 +116,5 @@ class App:
         if hasattr(self.game, "tick"):
             self.game.tick.cancel()
         opQueue.put("quit")
-        time.sleep(0.1)
+        time.sleep(0.3)
         root.quit()
