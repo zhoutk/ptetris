@@ -1,8 +1,8 @@
 import uuid
 import threading
+from queue import Queue
 
-curTetrisLock = threading.Lock()
-tickLock = [False, 0, 0]
+opQueue = Queue()
 
 TETRISDIMENSION = 4
 BLOCKSIDEWIDTH = 30

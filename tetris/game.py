@@ -5,6 +5,7 @@ from  tetris.config import *
 from tetris.tetris import Tetris
 import random
 from threading import Timer
+import time
 
 class Game:
     def __init__(self, canvas, nextCanvas, app = None) -> None:
@@ -14,6 +15,27 @@ class Game:
         self.nextCanvas = nextCanvas
         self.tetris = None
         self.nextTetris = None
+        self.worker = threading.Thread(target=self.opWork)
+        self.worker.start()
+
+    def opWork(self):
+        while True:
+            if not opQueue.empty():
+                op = opQueue.get()
+                if op == "Left":
+                    self.moveLeft()
+                elif op == "Right":
+                    self.moveRight()
+                elif op == "Up":
+                    self.rotate()
+                elif op == "Down":
+                    self.moveDown()
+                elif op == "space":
+                    self.moveDownEnd()
+                elif op == "quit":
+                    break
+            else:
+                time.sleep(0.01)
 
     def start(self):
         self.gameRunningStatus = 1
@@ -48,12 +70,7 @@ class Game:
 
     def tickoff(self):
         if self.gameRunningStatus == 1:
-            if not tickLock[0]:
-                with curTetrisLock:
-                    tickLock[1] += 1
-                    print("------------------ get lock", tickLock[1])
-                    self.moveDown()
-                    print("================== lose lock", tickLock[1])
+            opQueue.put('Down')
             self.tick = Timer(self.gameSpeedInterval / 1000, self.tickoff)
             self.tick.start()
 

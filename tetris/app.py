@@ -1,4 +1,5 @@
 # -*- coding: UTF-8 -*-
+from time import time
 from tetris.game import Game
 from tkinter import *
 from tkinter import ttk
@@ -66,22 +67,16 @@ class App:
     
     def processKeyboardEvent(self, ke):
         if self.game.getGameRunningStatus() == 1:
-            tickLock[0] = True
-            with curTetrisLock:
-                tickLock[2] += 1
-                print("-------+++---00000000--- get lock", tickLock)
-                if ke.keysym == 'Left':
-                    self.game.moveLeft()
-                if ke.keysym == 'Right':
-                    self.game.moveRight()
-                if ke.keysym == 'Up':
-                    self.game.rotate()
-                if ke.keysym == 'Down':
-                    self.game.moveDown()
-                if ke.keysym == 'space':
-                    self.game.moveDownEnd()
-            tickLock[0]= False
-            print("-------+++---00000000--- lose lock", tickLock)
+            if ke.keysym == 'Left':
+                opQueue.put('Left')
+            if ke.keysym == 'Right':
+                opQueue.put('Right')
+            if ke.keysym == 'Up':
+                opQueue.put('Up')
+            if ke.keysym == 'Down':
+                opQueue.put('Down')
+            if ke.keysym == 'space':
+                opQueue.put('space')
 
 
     def updateGameInfo(self, speed, levels, scores):
@@ -120,4 +115,6 @@ class App:
         print("timer close.")
         if hasattr(self.game, "tick"):
             self.game.tick.cancel()
+        opQueue.put("quit")
+        time.sleep(0.1)
         root.quit()
