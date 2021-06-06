@@ -39,10 +39,13 @@ class Tetris:
             return False
     
     def canPlace(self, x, y):
+        print("entry canPlace, ", x, y)
         for i in range(TETRISDIMENSION):
             for j in range(TETRISDIMENSION):
                 if self.data[i][j] and GameRoom[y + i][x + j]:
+                    print("rs canPlace false, ", x, y)
                     return False
+        print("rs canPlace true, ", x, y)
         return True
 
     def moveLeft(self):
@@ -57,8 +60,10 @@ class Tetris:
         self.relocate(self.x, self.y - 1)
 
     def moveDown(self):
+        print("enter tetris' down one line.")
         if self.canPlace(self.x, self.y + 1):
             self.relocate(self.x, self.y + 1)
+            print("down one line, ", self.x, self.y)
             return True
         else:
             for i in range(TETRISDIMENSION):
@@ -98,10 +103,13 @@ class Tetris:
                     self.objs.append(Block(self.canvas, self.x + j, self.y + i, self.color))
 
     def relocate(self, x, y):
+        print("entry relocate, ", x, y)
         for block in self.objs:
+            print("entry block loop, ", block.x, block.y)
             block.relocate(x - self.x, y - self.y)
         self.x = x
         self.y = y
+        print("rs relocate, ", x, y)
 
     def clean(self):
         for block in self.objs:

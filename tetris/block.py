@@ -10,7 +10,9 @@ class Block:
 
 
     def relocate(self, detaX, detaY):
+        print("entry block relocate, ", self.x, self.y, self.obj, detaX * BLOCKSIDEWIDTH, detaY * BLOCKSIDEWIDTH)
         self.canvas.move(self.obj, detaX * BLOCKSIDEWIDTH, detaY * BLOCKSIDEWIDTH)
+        print("move block relocate, ", self.x, self.y)
         self.x += detaX
         self.y += detaY
 

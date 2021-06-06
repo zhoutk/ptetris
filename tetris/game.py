@@ -53,7 +53,7 @@ class Game:
                     tickLock[1] += 1
                     print("------------------ get lock", tickLock[1])
                     self.moveDown()
-                    print("================== lose lock", tickLock[1])
+                print("================== lose lock", tickLock[1])
             self.tick = Timer(self.gameSpeedInterval / 1000, self.tickoff)
             self.tick.start()
 
@@ -133,6 +133,7 @@ class Game:
 
     def moveDown(self):
         rs = True
+        print("down one line, game movedown.")
         if not self.tetris.moveDown():
             self.generateNext()
             rs = False
