@@ -3,7 +3,6 @@ from time import time
 from tetris.game import Game
 from tkinter import *
 from tkinter import ttk
-import tkinter
 from tetris.block import *
 import time
 
@@ -30,28 +29,28 @@ class App:
         frame.place(x = 330, y = 160)
 
         Label(frame, text = "SPEED:").pack(anchor="w")
-        self.speedVar = tkinter.StringVar()
+        self.speedVar = StringVar()
         speed = Label(frame, height=1, width=12, relief=SUNKEN, bd=1, textvariable=self.speedVar)
         speed.pack(anchor="w")
 
         Label(frame, text = "LEVELS:").pack(anchor="w")
-        self.levelsVar = tkinter.StringVar()
+        self.levelsVar = StringVar()
         levels = Label(frame, height=1, width=12, relief=SUNKEN, bd=1, textvariable=self.levelsVar)
         levels.pack(anchor="w")
 
         Label(frame, text = "SCORES:").pack(anchor="w")
-        self.scoresVar = tkinter.StringVar()
+        self.scoresVar = StringVar()
         scores = Label(frame, height=1, width=12, relief=SUNKEN, bd=1, textvariable=self.scoresVar)
         scores.pack(anchor="w")
 
         Label(frame, text = "").pack(anchor="w")
         Checkbutton(frame, text = "AutoPlay").pack(anchor="w")
-        self.btnStartVar = tkinter.StringVar()
+        self.btnStartVar = StringVar()
         self.btnStartVar.set("Start")
         Button(frame, height=1, width=10, command=self.btnStartClicked, textvariable=self.btnStartVar).pack(anchor="w")
 
         Label(frame, text = "").pack(anchor="w")
-        coboxVar = tkinter.StringVar
+        coboxVar = StringVar
         cobox = ttk.Combobox(frame, textvariable=coboxVar, height=5, width=8, state="readonly")
         cobox.pack(anchor="w")
         cobox["value"] = ("last", "one", "two", "three")
