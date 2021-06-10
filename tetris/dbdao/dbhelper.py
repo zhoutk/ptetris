@@ -8,10 +8,10 @@ def exec_sql(sql, values, is_query=False):
         if not os.path.exists("./dist"):
             os.mkdir("dist")
         conn = dbHandle.connect("./dist/log.db")
-        c = conn.cursor()
-        num = c.execute(sql)
+        cur = conn.cursor()
+        num = cur.execute(sql, values)
         if is_query:
-            result = c.fetchall()
+            result = cur.fetchall()
         else:
             conn.commit()
         print('Sql: ', sql, ' Values: ', values)
@@ -23,7 +23,7 @@ def exec_sql(sql, values, is_query=False):
         conn.close()
         if flag:
             return False, error, num if 'num' in dir() else 0
-    return True, result if 'result' in dir() else '', num
+    return True, result if 'result' in dir() else '', num.rowcount
 
 
 def delete(tablename, params={}):
@@ -51,16 +51,20 @@ def update(tablename, params={}):
 
 
 def insert(tablename, params={}):
-    sql = "insert into %s set " % tablename
+    sql = "insert into %s ( " % tablename
     ks = params.keys()
+    vs = []
+    ps = ""
     for al in ks:
-        sql += "`" + al + "` = %(" + al + ")s,"
-    sql = sql[:-1]
-    rs = exec_sql(sql, params)
+        sql += al + ","
+        ps += "?,"
+        vs.append(params[al])
+    sql = sql[:-1] + ") values (" + ps[:-1] + ")"
+    rs = exec_sql(sql, vs)
     if rs[0]:
         return {"code": 200, "info": "create success.", "total": rs[2]}
     else:
-        return {"code": rs[1].args[0], "error": rs[1].args[1], "total": rs[2]}
+        return {"code": 701, "error": rs[1].args[0], "total": rs[2]}
 
 
 def select(tablename, params={}, fields=[]):

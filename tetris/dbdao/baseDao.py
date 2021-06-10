@@ -2,10 +2,10 @@ from tetris.dbdao import dbhelper
 
 class BaseDao(object):
 
-    def retrieve(self, table, params={}, fields=[]):
+    def select(self, table, params={}, fields=[]):
         return dbhelper.select(table, params)
 
-    def create(self, table, params={}, fields=[]):
+    def insert(self, table, params={}, fields=[]):
         if '_id_' in params and len(params) < 2 or '_id_' not in params and len(params) < 1:
             return {"code": 301, "err": "The params is error."}
         return dbhelper.insert(table, params)
@@ -31,7 +31,3 @@ class BaseDao(object):
 
     def transGo(elements = [], isAsync = False):
         pass
-
-if __name__ == "__main__":
-    print("This is a main function.")
-    dao = BaseDao("gameLists")
