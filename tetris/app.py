@@ -19,11 +19,11 @@ def start():
 
 def initDb():
     dao = BaseDao()
-    dao.execSql("CREATE TABLE IF NOT EXISTS 'gameRecords' ('id' text NOT NULL PRIMARY KEY,\
+    dao.execSql("CREATE TABLE IF NOT EXISTS 'gameRecords' ('_id_' text NOT NULL PRIMARY KEY,\
 			'gameId' text NOT NULL, 'blockType' integer NOT NULL,\
 			'rotateNumber' integer DEFAULT 0,'LocateX' integer NOT NULL,'LocateY' integer NOT NULL,\
 			'stepId' integer NOT NULL, 'create_time' text DEFAULT (datetime('now','localtime')));")
-    dao.execSql("CREATE TABLE IF NOT EXISTS 'gameLists' ('id' text NOT NULL PRIMARY KEY,\
+    dao.execSql("CREATE TABLE IF NOT EXISTS 'gameLists' ('_id_' text NOT NULL PRIMARY KEY,\
         'speed' integer DEFAULT 1,'levels' integer DEFAULT 0,'scores' integer DEFAULT 0,\
         'steps' integer DEFAULT 0,'create_time' text DEFAULT (datetime('now','localtime')));")
 

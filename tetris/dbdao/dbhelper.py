@@ -5,9 +5,9 @@ def exec_sql(sql, values, is_query=False):
     try:
         flag = False
         error = {}
-        if not os.path.exists("./build"):
-            os.mkdir("build")
-        conn = dbHandle.connect("./build/log.db")
+        if not os.path.exists("./dist"):
+            os.mkdir("dist")
+        conn = dbHandle.connect("./dist/log.db")
         c = conn.cursor()
         num = c.execute(sql)
         if is_query:

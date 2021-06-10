@@ -5,6 +5,7 @@ from  tetris.config import *
 from tetris.tetris import Tetris
 import random
 from threading import Timer
+import threading
 import time
 
 class Game:

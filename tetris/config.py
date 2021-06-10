@@ -1,5 +1,4 @@
 import uuid
-import threading
 from queue import Queue
 
 opQueue = Queue()
