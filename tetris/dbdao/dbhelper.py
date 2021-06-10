@@ -26,7 +26,7 @@ def exec_sql(sql, values, opType = 0):
         conn.close()
         if flag:
             return False, error, num if 'num' in dir() else 0
-    return True, result if 'result' in dir() else '', num.rowcount
+    return True, result if 'result' in dir() else [], len(result) if 'result' in dir() else 0
 
 
 def delete(tablename, params={}):
@@ -78,16 +78,16 @@ def select(tablename, params={}, fields=[]):
     pvs = []
     if len(ks) > 0:
         for al in ks:
-            ps.append(al + " =%s ")
+            ps.append(al + " =? ")
             pvs.append(params[al])
         where += ' where ' + ' and '.join(ps)
 
-    rs = exec_sql(sql+where, pvs, True)
+    rs = exec_sql(sql+where, pvs, 2)
     print('Result: ', rs)
     if rs[0]:
         return {"code": 200, "rows": rs[1], "total": rs[2]}
     else:
-        return {"code": rs[1].args[0], "error": rs[1].args[1], "total": rs[2]}
+        return {"code": 602, "error": rs[1].args[0], "total": rs[2]}
 
 def insertBatch(tablename, elements=[]):
     sql = "insert into %s ( " % tablename
