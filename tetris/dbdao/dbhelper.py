@@ -1,7 +1,7 @@
 import sqlite3 as dbHandle
 import os
 
-def exec_sql(sql, values, is_query=False):
+def exec_sql(sql, values, opType = 0):
     try:
         flag = False
         error = {}
@@ -9,8 +9,11 @@ def exec_sql(sql, values, is_query=False):
             os.mkdir("dist")
         conn = dbHandle.connect("./dist/log.db")
         cur = conn.cursor()
-        num = cur.execute(sql, values)
-        if is_query:
+        if opType == 1:
+            num = cur.executemany(sql, values)
+        else:
+            num = cur.execute(sql, values)
+        if opType == 2:
             result = cur.fetchall()
         else:
             conn.commit()
@@ -86,5 +89,26 @@ def select(tablename, params={}, fields=[]):
     else:
         return {"code": rs[1].args[0], "error": rs[1].args[1], "total": rs[2]}
 
+def insertBatch(tablename, elements=[]):
+    sql = "insert into %s ( " % tablename
+    isFirst = True
+    vs = []
+    ps = ""
+    for ele in elements:
+        if isFirst:
+            isFirst = False
+            ks = ele.keys()
+            for al in ks:
+                sql += al + ","
+                ps += "?,"
+        items = []
+        for bl in ks:
+            items.append(ele[bl])
+        vs.append(items)
+    sql = sql[:-1] + ") values (" + ps[:-1] + ")"
+    rs = exec_sql(sql, vs, 1)
+    if rs[0]:
+        return {"code": 200, "info": "create success.", "total": rs[2]}
+    else:
+        return {"code": 701, "error": rs[1].args[0], "total": rs[2]}
 
-# select('member', {'username': 'admin', "status": 1})

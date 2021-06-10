@@ -9,6 +9,9 @@ from tetris.dbdao.baseDao import *
 
 def start():
     initDb()
+    # dao = BaseDao()
+    # rs = dao.insertBatch("gameLists",[{"_id_": "939866","speed": 6},{"_id_": "139866","speed": 9}])
+    # print(rs)
     root = Tk()
     root.title("Tetris")
     root.geometry('470x630')
