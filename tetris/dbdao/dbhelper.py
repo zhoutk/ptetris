@@ -26,31 +26,36 @@ def exec_sql(sql, values, opType = 0):
         conn.close()
         if flag:
             return False, error, num if 'num' in dir() else 0
-    return True, result if 'result' in dir() else [], len(result) if 'result' in dir() else 0
+    return True, result if 'result' in dir() else [], len(result) if opType == 2 else num.rowcount if 'num' in dir() else 0
 
 
 def delete(tablename, params={}):
-    sql = "delete from %s " % tablename
-    sql += " where _id = %(_id)s "
-    rs = exec_sql(sql, params)
+    sql = "delete from %s  where _id_ = ? " % tablename
+    rs = exec_sql(sql, [params["_id_"]])
     if rs[0]:
         return {"code": 200, "info": "delete success.", "total": rs[2]}
     else:
-        return {"code": rs[1].args[0], "error": rs[1].args[1], "total": rs[2]}
+        return {"code": 401, "error": rs[1].args[0], "total": rs[2]}
 
 
 def update(tablename, params={}):
     sql = "update %s set " % tablename
     ks = params.keys()
+    vs = []
     for al in ks:
-        sql += "`" + al + "` = %(" + al + ")s,"
+        if not al == "_id_":
+            sql += "`" + al + "` = ?,"
+            vs.append(params[al])
+        else:
+            idVal = params[al]
     sql = sql[:-1]
-    sql += " where _id = %(_id)s "
-    rs = exec_sql(sql, params)
+    sql += " where _id_ = ? "
+    vs.append(idVal)
+    rs = exec_sql(sql, vs)
     if rs[0]:
         return {"code": 200, "info": "update success.", "total": rs[2]}
     else:
-        return {"code": rs[1].args[0], "error": rs[1].args[1], "total": rs[2]}
+        return {"code": 402, "error": rs[1].args[0], "total": rs[2]}
 
 
 def insert(tablename, params={}):
@@ -111,4 +116,3 @@ def insertBatch(tablename, elements=[]):
         return {"code": 200, "info": "create success.", "total": rs[2]}
     else:
         return {"code": 701, "error": rs[1].args[0], "total": rs[2]}
-
