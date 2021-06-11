@@ -2,8 +2,8 @@ from tetris.dbdao import dbhelper
 
 class BaseDao(object):
 
-    def select(self, table, params={}, fields=[]):
-        return dbhelper.select(table, params)
+    def select(self, tablename, params={}, fields=[]):
+        return dbhelper.select(tablename, params)
 
     def insert(self, tablename, params={}, fields=[]):
         if '_id_' in params and len(params) < 2 or '_id_' not in params and len(params) < 1:
@@ -20,8 +20,8 @@ class BaseDao(object):
             return {"code": 301, "err": "The params is error."}
         return dbhelper.delete(tablename, params)
 
-    def querySql(self, values = [], params = {}, fields = []):
-        pass
+    def querySql(self, sql, values = [], params = {}, fields = []):
+        return dbhelper.querySql(sql, values, params, fields)
 
     def execSql(self, sql, values = []):
         return dbhelper.exec_sql(sql, values)

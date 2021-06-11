@@ -74,21 +74,31 @@ def insert(tablename, params={}):
     else:
         return {"code": 701, "error": rs[1].args[0], "total": rs[2]}
 
+def querySql(sql, values =[], params ={}, fields = []):
+    return select("QuerySqlSelect", params, fields, sql, values)
 
-def select(tablename, params={}, fields=[]):
+
+def select(tablename, params={}, fields=[], sql = "", values = []):
     sql = "select %s from %s " % ('*' if len(fields) == 0 else ','.join(fields), tablename)
-    ks = params.keys()
     where = ""
-    ps = []
-    pvs = []
-    if len(ks) > 0:
-        for al in ks:
-            ps.append(al + " =? ")
-            pvs.append(params[al])
-        where += ' where ' + ' and '.join(ps)
 
-    rs = exec_sql(sql+where, pvs, 2)
-    print('Result: ', rs)
+    reserveKeys = {}
+    for rk in ["sort", "search", "page", "size", "sum", "count", "group"]:
+        if params.get(rk):
+            reserveKeys[rk] = params[rk]
+            params.pop(rk)
+
+    ps = []
+    for k, v in params.items():
+        if k == "ins":
+            ps.append(v[0] + " in (%s) " % ','.join('?'*len(v[1:])))
+            values += v[1:]
+        else:
+            ps.append(k + " =? ")
+            values.append(v)
+    where += ' where ' + ' and '.join(ps)
+
+    rs = exec_sql(sql+where, values, 2)
     if rs[0]:
         return {"code": 200, "rows": rs[1], "total": rs[2]}
     else:
