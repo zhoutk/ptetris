@@ -160,7 +160,8 @@ def select(tablename, params={}, fields=[], sql = "", values = []):
         size = 10
     if page and page > 0:
         page -= 1
-        sql += " LIMIT %d,%d " % (page * size, size)
+        # sql += " LIMIT %d,%d " % (page * size, size)
+        sql += f' LIMIT {page * size}, {size}'
         
     rs = exec_sql(sql, values, 2)
     if rs[0]:
