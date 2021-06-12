@@ -107,11 +107,12 @@ def select(tablename, params={}, fields=[], sql = "", values = []):
             whereExtra += ' ) '
         else:
             flag = False
-            vals = v.split(',')
-            for condition in ['>','>=','<','<=','==','<>']:
-                if vals[0] == condition:
-                    flag = True
-                    break
+            if type(v) == "str":
+                vals = v.split(',')
+                for condition in ['>','>=','<','<=','==','<>']:
+                    if vals[0] == condition:
+                        flag = True
+                        break
             if flag:
                 if len(vals) == 2:
                     where += k + vals[0] + ' ? '
@@ -123,15 +124,26 @@ def select(tablename, params={}, fields=[], sql = "", values = []):
                 else:
                     if where.endswith(AndJoinStr):
                         where = where[:-len(AndJoinStr)]
+            elif reserveKeys.get('search'):
+                whereExtra += k + " like ? "
+                values.append("%" + v + "%")
             else:
                 whereExtra += k + " =? "
                 values.append(v)
         where += whereExtra
 
+    extra = ""
+    v = reserveKeys.get('sum')
+    if v != None:
+        extra += ', sum('+ v[0] +') as ' + v[1]
+    v = reserveKeys.get('count')
+    if v != None:
+        extra += ', count('+ v[0] +') as ' + v[1]
+
     if tablename == 'QuerySqlSelect':
         sql = sql + ('' if where == '' else (' and ' + where))
     else:
-        sql = "select %s from %s " % ('*' if len(fields) == 0 else ','.join(fields), tablename)
+        sql = "select %s %s from %s " % ('*' if len(fields) == 0 else ','.join(fields), extra, tablename)
         sql += '' if where == '' else ' WHERE ' + where
 
     rs = exec_sql(sql, values, 2)
