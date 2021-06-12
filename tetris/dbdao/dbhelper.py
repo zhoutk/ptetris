@@ -79,8 +79,8 @@ def querySql(sql, values =[], params ={}, fields = []):
 
 
 def select(tablename, params={}, fields=[], sql = "", values = []):
-    sql = "select %s from %s " % ('*' if len(fields) == 0 else ','.join(fields), tablename)
     where = ""
+    AndJoinStr = ' and '
 
     reserveKeys = {}
     for rk in ["sort", "search", "page", "size", "sum", "count", "group"]:
@@ -90,15 +90,34 @@ def select(tablename, params={}, fields=[], sql = "", values = []):
 
     ps = []
     for k, v in params.items():
+        if where != '':
+            where += AndJoinStr
+        whereExtra = ""
         if k == "ins":
-            ps.append(v[0] + " in (%s) " % ','.join('?'*len(v[1:])))
+            whereExtra += v[0] + " in (%s) " % ','.join('?'*len(v[1:]))
             values += v[1:]
+        elif k == "lks" or k == "ors":
+            whereExtra = ' ( '
+            index = 0
+            while index < len(v):
+                if index > 0:
+                    whereExtra += ' or '
+                whereExtra += v[index] + (' like' if k == 'lks' else ' =') + ' ? '
+                values.append("%" + v[index + 1] + "%")
+                index += 2
+            whereExtra += ' ) '
         else:
-            ps.append(k + " =? ")
+            whereExtra += k + " =? "
             values.append(v)
-    where += ' where ' + ' and '.join(ps)
+        where += whereExtra
 
-    rs = exec_sql(sql+where, values, 2)
+    if tablename == 'QuerySqlSelect':
+        sql = sql + ('' if where == '' else (' and ' + where))
+    else:
+        sql = "select %s from %s " % ('*' if len(fields) == 0 else ','.join(fields), tablename)
+        sql += '' if where == '' else ' WHERE ' + where
+
+    rs = exec_sql(sql, values, 2)
     if rs[0]:
         return {"code": 200, "rows": rs[1], "total": rs[2]}
     else:
