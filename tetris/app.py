@@ -11,7 +11,7 @@ def start():
     initDb()
     dao = BaseDao()
     # rs = dao.select("gameLists",{"page": 1, "size":2, "levels":1, "ins":["speed", "5"]})
-    rs = dao.select("gameLists",{"page": 1, "size":2, "levels":1, "lks":["_id_", "6"]})
+    rs = dao.select("gameLists",{"page": 1, "size":2, "speed":">,5,<,9"})
     print(rs)
 
     # rs = dao.update("gameLists",{"_id_": "139866","speed": 5, "levels": 1, "scores": 2})

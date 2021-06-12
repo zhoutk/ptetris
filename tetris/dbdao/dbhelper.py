@@ -88,7 +88,6 @@ def select(tablename, params={}, fields=[], sql = "", values = []):
             reserveKeys[rk] = params[rk]
             params.pop(rk)
 
-    ps = []
     for k, v in params.items():
         if where != '':
             where += AndJoinStr
@@ -103,12 +102,30 @@ def select(tablename, params={}, fields=[], sql = "", values = []):
                 if index > 0:
                     whereExtra += ' or '
                 whereExtra += v[index] + (' like' if k == 'lks' else ' =') + ' ? '
-                values.append("%" + v[index + 1] + "%")
+                values.append("%" + v[index + 1] + "%" if k == 'lks' else v[index + 1])
                 index += 2
             whereExtra += ' ) '
         else:
-            whereExtra += k + " =? "
-            values.append(v)
+            flag = False
+            vals = v.split(',')
+            for condition in ['>','>=','<','<=','==','<>']:
+                if vals[0] == condition:
+                    flag = True
+                    break
+            if flag:
+                if len(vals) == 2:
+                    where += k + vals[0] + ' ? '
+                    values.append(vals[1])
+                elif len(vals) == 4:
+                    where += k + vals[0] + ' ? and ' + k + vals[2] + ' ? '
+                    values.append(vals[1])
+                    values.append(vals[3])
+                else:
+                    if where.endswith(AndJoinStr):
+                        where = where[:-len(AndJoinStr)]
+            else:
+                whereExtra += k + " =? "
+                values.append(v)
         where += whereExtra
 
     if tablename == 'QuerySqlSelect':
