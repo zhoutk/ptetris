@@ -9,20 +9,20 @@ from tetris.dbdao.baseDao import *
 
 def start():
     initDb()
-    dao = BaseDao()
-    # rs = dao.select("gameLists",{"page": 1, "size":2, "levels":1, "ins":["speed", "5"]})
-    rs = dao.select("gameLists",{"page": 1, "size":2, "count":["*","total"]}, ["_id_"])
-    print(rs)
+    # dao = BaseDao()
+    # # rs = dao.select("gameLists",{"page": 1, "size":2, "levels":1, "ins":["speed", "5"]})
+    # rs = dao.select("gameLists",{"sort":"levels desc"}, ["_id_"])
+    # print(rs)
 
     # rs = dao.update("gameLists",{"_id_": "139866","speed": 5, "levels": 1, "scores": 2})
     # rs = dao.insertBatch("gameLists",[{"_id_": "939866","speed": 6},{"_id_": "139866","speed": 9}])
 
-    # root = Tk()
-    # root.title("Tetris")
-    # root.geometry('470x630')
-    # root.resizable(0, 0)
-    # App(root)
-    # root.mainloop()
+    root = Tk()
+    root.title("Tetris")
+    root.geometry('470x630')
+    root.resizable(0, 0)
+    App(root)
+    root.mainloop()
 
 
 def initDb():

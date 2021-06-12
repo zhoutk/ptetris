@@ -146,6 +146,22 @@ def select(tablename, params={}, fields=[], sql = "", values = []):
         sql = "select %s %s from %s " % ('*' if len(fields) == 0 else ','.join(fields), extra, tablename)
         sql += '' if where == '' else ' WHERE ' + where
 
+    v = reserveKeys.get('group')
+    if v != None:
+        sql += ' GROUP BY ' + v
+
+    v = reserveKeys.get('sort')
+    if v != None:
+        sql += ' ORDER BY ' + v
+
+    page = reserveKeys.get('page')
+    size = reserveKeys.get('size')
+    if not size:
+        size = 10
+    if page and page > 0:
+        page -= 1
+        sql += " LIMIT %d,%d " % (page * size, size)
+        
     rs = exec_sql(sql, values, 2)
     if rs[0]:
         return {"code": 200, "rows": rs[1], "total": rs[2]}
