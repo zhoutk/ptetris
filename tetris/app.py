@@ -102,7 +102,6 @@ class App:
         self.speedVar.set(speed)
         self.levelsVar.set(levels)
         self.scoresVar.set(scores)
-        print("update game infomation.")
 
     def setStartButtonText(self, text):
         self.btnStartVar.set(text)
@@ -135,5 +134,6 @@ class App:
         if hasattr(self.game, "tick"):
             self.game.tick.cancel()
         opQueue.put("quit")
+        dbQueue.put(("quit",{}))
         time.sleep(0.3)
         root.quit()

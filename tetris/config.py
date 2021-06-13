@@ -2,6 +2,7 @@ import uuid
 from queue import Queue
 
 opQueue = Queue()
+dbQueue = Queue()
 
 TETRISDIMENSION = 4
 BLOCKSIDEWIDTH = 30

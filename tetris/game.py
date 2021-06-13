@@ -7,10 +7,13 @@ import random
 from threading import Timer
 import threading
 import time
+from tetris.dbdao.baseDao import *
 
 class Game:
     def __init__(self, canvas, nextCanvas, app = None) -> None:
         self.app = app
+        self.stepNum = 0
+        self.dao = BaseDao()
         self.gameRunningStatus = 0
         self.canvas = canvas
         self.nextCanvas = nextCanvas
@@ -18,6 +21,8 @@ class Game:
         self.nextTetris = None
         self.worker = threading.Thread(target=self.opWork)
         self.worker.start()
+        self.dbSaver = threading.Thread(target=self.dbSave)
+        self.dbSaver.start()
 
     def opWork(self):
         while True:
@@ -37,6 +42,17 @@ class Game:
                     break
             else:
                 time.sleep(0.01)
+        
+    def dbSave(self):
+        while True:
+            if not dbQueue.empty():
+                tablename,params = dbQueue.get()
+                if tablename != "quit":
+                    self.dao.insert(tablename, params)
+                else:
+                    break
+            else:
+                time.sleep(0.01)
 
     def start(self):
         self.gameRunningStatus = 1
@@ -44,6 +60,7 @@ class Game:
         self.gameSpeed = 1
         self.gameLevels = 0
         self.gameScores = 0
+        self.stepNum = 0
         self.app.updateGameInfo(1,0,0)
         self.canvas.delete(ALL)
         self.nextCanvas.delete(ALL)
@@ -77,6 +94,17 @@ class Game:
 
 
     def generateNext(self):
+        self.stepNum += 1
+        if self.gameRunningStatus == 1:
+            dbQueue.put(("gameRecords",{
+                "_id_":UID(), 
+                "gameId":self.gameID,
+                "blockType": self.tetris.getTetrisShape(),
+                "rotateNumber": self.tetris.getRotateCount(),
+                "LocateX": self.tetris.x,
+                "LocateY": self.tetris.y,
+                "stepId": self.stepNum,
+                }))
         cleanLevels = self.clearRows()
         if cleanLevels > 0:
             self.gameLevels += cleanLevels
@@ -95,11 +123,28 @@ class Game:
             for i in range(random.randint(0,4)):
                 self.nextTetris.rotate()
         else:
-            self.gameRunningStatus = 0
             self.canvas.create_text(150, 200, text = "Game is over!", fill="white", font = "Times 28 italic bold")
             self.app.setStartButtonText("Start")
             print("game is over!")
-
+            if self.gameRunningStatus == 1:
+                dbQueue.put(("gameRecords",{
+                    "_id_":UID(), 
+                    "gameId":self.gameID,
+                    "blockType": self.nextTetris.getTetrisShape(),
+                    "rotateNumber": self.nextTetris.getRotateCount(),
+                    "LocateX": 4,
+                    "LocateY": 0,
+                    "stepId": self.stepNum + 1,
+                    }))
+                dbQueue.put(("gameLists",{
+                    "_id_":self.gameID, 
+                    "speed": self.gameSpeed,
+                    "levels": self.gameLevels,
+                    "scores": self.gameScores,
+                    "steps": self.stepNum + 1,
+                    }))
+            self.gameRunningStatus = 0
+                
     def getGameRunningStatus(self):
         return self.gameRunningStatus
 
