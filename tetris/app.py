@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
 from time import time
+import tkinter
 from tetris.game import Game
 from tkinter import *
 from tkinter import ttk
@@ -67,7 +68,8 @@ class App:
         Checkbutton(frame, text = "AutoPlay").pack(anchor="w")
         self.btnStartVar = StringVar()
         self.btnStartVar.set("Start")
-        Button(frame, height=1, width=10, command=self.btnStartClicked, textvariable=self.btnStartVar).pack(anchor="w")
+        self.btnStart = Button(frame, height=1, width=10, command=self.btnStartClicked, textvariable=self.btnStartVar)
+        self.btnStart.pack(anchor="w")
 
         Label(frame, text = "").pack(anchor="w")
         coboxVar = StringVar
@@ -77,7 +79,8 @@ class App:
         cobox.current(0)
         cobox.bind("<<ComboboxSelected>>", self.comboxClicked)
         self.cobox = cobox
-        Button(frame, text = "PlayBack", height=1, width=10, command = self.btnPlaybackClicked).pack(anchor="w")
+        self.btnPlayBack = Button(frame, text = "PlayBack", height=1, width=10, command = self.btnPlaybackClicked)
+        self.btnPlayBack.pack(anchor="w")
 
         self.gameCanvas.bind(sequence="<Key>", func=self.processKeyboardEvent)
         self.game = Game(self.gameCanvas, self.nextCanvas, self)
@@ -97,6 +100,11 @@ class App:
             if ke.keysym == 'space':
                 opQueue.put('space')
 
+    def setButtonStartState(self, status):
+        self.btnStart.config(state = status)
+
+    def setButtonPlayBackState(self, status):
+        self.btnPlayBack.config(state = status)
 
     def updateGameInfo(self, speed, levels, scores):
         self.speedVar.set(speed)
@@ -107,6 +115,7 @@ class App:
         self.btnStartVar.set(text)
 
     def btnStartClicked(self):
+        self.btnPlayBack.config(state = tkinter.DISABLED)
         if self.game.getGameRunningStatus() == 0:
             self.btnStartVar.set("Pause")
             self.game.start()

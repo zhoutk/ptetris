@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
 
+import tkinter
 from tkinter.constants import ALL
 from  tetris.config import *
 from tetris.tetris import Tetris
@@ -144,6 +145,7 @@ class Game:
                     "steps": self.stepNum + 1,
                     }))
             self.gameRunningStatus = 0
+            self.app.setButtonPlayBackState(tkinter.ACTIVE)
                 
     def getGameRunningStatus(self):
         return self.gameRunningStatus
