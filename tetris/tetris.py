@@ -70,16 +70,18 @@ class Tetris:
                 if self.data[i][j]:
                     GameRoom[self.y + i][self.x + j] = 1
 
-    def rotate(self):
-        for i in range(TETRISDIMENSION // 2):
-            lenJ = TETRISDIMENSION - i - 1
-            for j in range(i, lenJ):
-                lenI = TETRISDIMENSION - j - 1
-                if self.data[i][j] and self.hasBlock(self.x + lenJ, self.y + j) or \
-                    self.data[lenI][i] and self.hasBlock(self.x + j, self.y + i) or \
-                    self.data[lenJ][lenI] and self.hasBlock(self.x + i, self.y + lenI) or \
-                    self.data[j][lenJ] and self.hasBlock(self.x + lenI, self.y + lenJ):
-                    return False
+    def rotate(self, isCheck = None):
+        isCheck = True if isCheck == None else False
+        if isCheck:
+            for i in range(TETRISDIMENSION // 2):
+                lenJ = TETRISDIMENSION - i - 1
+                for j in range(i, lenJ):
+                    lenI = TETRISDIMENSION - j - 1
+                    if self.data[i][j] and self.hasBlock(self.x + lenJ, self.y + j) or \
+                        self.data[lenI][i] and self.hasBlock(self.x + j, self.y + i) or \
+                        self.data[lenJ][lenI] and self.hasBlock(self.x + i, self.y + lenI) or \
+                        self.data[j][lenJ] and self.hasBlock(self.x + lenI, self.y + lenJ):
+                        return False
         for i in range(TETRISDIMENSION // 2):
             lenJ = TETRISDIMENSION - i - 1
             for j in range(i, lenJ):

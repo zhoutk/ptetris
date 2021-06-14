@@ -85,6 +85,7 @@ class Game:
         self.records = rs.get("rows")
 
         self.gameRunningStatus = 2
+        self.gameSpeedInterval = 1000
         self.gameSpeed = 1
         self.gameLevels = 0
         self.gameScores = 0
@@ -103,7 +104,7 @@ class Game:
             self.nextTetris = Tetris(self.nextCanvas, 1, 1, blockType)
             for i in range(rotateNumber % 4):
                 self.nextTetris.rotate()
-            self.tick = Timer(0.1, self.tickoff)
+            self.tick = Timer(0, self.tickoff)
             self.tick.start()
         else:
             self.app.setButtonStartState(tkinter.ACTIVE)
@@ -126,7 +127,7 @@ class Game:
             self.tetris.relocate(self.LocateX, self.LocateY)
             self.tetris.fixTetrisInGameRoom()
             self.generateNext()
-            self.tick = Timer(0.1, self.tickoff)
+            self.tick = Timer(0, self.tickoff)
             self.tick.start()
 
 
@@ -167,7 +168,7 @@ class Game:
                 self.nextTetris = Tetris(self.nextCanvas, 1,1, blockType)
                 initRotate = rotateNumber
             for i in range(initRotate):
-                self.nextTetris.rotate()
+                self.nextTetris.rotate(False)
         else:
             self.canvas.create_text(150, 200, text = "Game is over!", fill="white", font = "Times 28 italic bold")
             self.app.setStartButtonText("Start")
