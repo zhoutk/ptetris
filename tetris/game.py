@@ -24,6 +24,7 @@ class Game:
         self.worker.start()
         self.dbSaver = threading.Thread(target=self.dbSave)
         self.dbSaver.start()
+        self.records = []
 
     def opWork(self):
         while True:
@@ -79,6 +80,35 @@ class Game:
         self.tick.start()
 
 
+    def playback(self, gameID):
+        rs = self.dao.select("gameRecords",{"gameId":gameID,"sort":"stepId"},["blockType","rotateNumber","LocateX","LocateY","stepId"])
+        self.records = rs.get("rows")
+
+        self.gameRunningStatus = 2
+        self.gameSpeed = 1
+        self.gameLevels = 0
+        self.gameScores = 0
+        self.stepNum = 1
+        self.app.updateGameInfo(1,0,0)
+        self.canvas.delete(ALL)
+        self.nextCanvas.delete(ALL)
+        initGameRoom()
+
+        if len(self.records) > 2:
+            blockType,rotateNumber,self.LocateX,self.LocateY,stepId = self.records[0]
+            self.tetris = Tetris(self.canvas, 4, 0,blockType)
+            for i in range(rotateNumber % 4):
+                self.tetris.rotate()
+            blockType,rotateNumber,LocateX,LocateY,stepId = self.records[1]
+            self.nextTetris = Tetris(self.nextCanvas, 1, 1, blockType)
+            for i in range(rotateNumber % 4):
+                self.nextTetris.rotate()
+            self.tick = Timer(0.1, self.tickoff)
+            self.tick.start()
+        else:
+            self.app.setButtonStartState(tkinter.ACTIVE)
+            self.app.setButtonPlayBackState(tkinter.ACTIVE)
+
     def pause(self):
         self.gameRunningStatus = 5
 
@@ -91,6 +121,12 @@ class Game:
         if self.gameRunningStatus == 1:
             opQueue.put('Down')
             self.tick = Timer(self.gameSpeedInterval / 1000, self.tickoff)
+            self.tick.start()
+        elif self.gameRunningStatus == 2:
+            self.tetris.relocate(self.LocateX, self.LocateY)
+            self.tetris.fixTetrisInGameRoom()
+            self.generateNext()
+            self.tick = Timer(0.1, self.tickoff)
             self.tick.start()
 
 
@@ -120,8 +156,17 @@ class Game:
                 break
         if self.tetris.canPlace(4, 0):
             self.nextCanvas.delete(ALL)
-            self.nextTetris = Tetris(self.nextCanvas, 1, 1, random.randint(0,6))
-            for i in range(random.randint(0,4)):
+            initRotate = 0
+            if self.gameRunningStatus == 1:
+                self.nextTetris = Tetris(self.nextCanvas, 1, 1, random.randint(0,6))
+                initRotate = random.randint(0,4)
+            else:
+                blockType,rotateNumber,self.LocateX,self.LocateY,stepId = self.records[self.stepNum - 1]
+                self.tetris.relocate(self.LocateX, self.tetris.y)
+                blockType,rotateNumber,LocateX,LocateY,stepId = self.records[self.stepNum]
+                self.nextTetris = Tetris(self.nextCanvas, 1,1, blockType)
+                initRotate = rotateNumber
+            for i in range(initRotate):
                 self.nextTetris.rotate()
         else:
             self.canvas.create_text(150, 200, text = "Game is over!", fill="white", font = "Times 28 italic bold")
@@ -145,6 +190,7 @@ class Game:
                     "steps": self.stepNum + 1,
                     }))
             self.gameRunningStatus = 0
+            self.app.setButtonStartState(tkinter.ACTIVE)
             self.app.setButtonPlayBackState(tkinter.ACTIVE)
                 
     def getGameRunningStatus(self):

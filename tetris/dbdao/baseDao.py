@@ -1,9 +1,11 @@
+from tkinter.constants import NO
 from tetris.dbdao import dbhelper
 
 class BaseDao(object):
 
-    def select(self, tablename, params={}, fields=[]):
-        return dbhelper.select(tablename, params)
+    def select(self, tablename, params={}, fields=None):
+        fields = [] if fields == None else fields
+        return dbhelper.select(tablename, params, fields)
 
     def insert(self, tablename, params={}, fields=[]):
         if '_id_' in params and len(params) < 2 or '_id_' not in params and len(params) < 1:

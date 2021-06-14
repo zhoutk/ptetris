@@ -78,7 +78,10 @@ def querySql(sql, values =[], params ={}, fields = []):
     return select("QuerySqlSelect", params, fields, sql, values)
 
 
-def select(tablename, params={}, fields=[], sql = "", values = []):
+def select(tablename, params={}, fields=None, sql = None, values = None):
+    fields = [] if fields == None else fields
+    sql = "" if sql == None else sql
+    values = [] if values == None else values
     where = ""
     AndJoinStr = ' and '
 
@@ -164,8 +167,10 @@ def select(tablename, params={}, fields=[], sql = "", values = []):
         sql += f' LIMIT {page * size}, {size}'
         
     rs = exec_sql(sql, values, 2)
-    if rs[0]:
+    if rs[0] and len(rs[1]) > 0:
         return {"code": 200, "rows": rs[1], "total": rs[2]}
+    elif len(rs[1]) == 0:
+        return {"code": 602, "info": "There is no records.", "total": rs[2]}
     else:
         return {"code": 602, "error": rs[1].args[0], "total": rs[2]}
 

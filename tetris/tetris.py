@@ -61,11 +61,14 @@ class Tetris:
             self.relocate(self.x, self.y + 1)
             return True
         else:
-            for i in range(TETRISDIMENSION):
-                for j in range(TETRISDIMENSION):
-                    if self.data[i][j]:
-                        GameRoom[self.y + i][self.x + j] = 1
+            self.fixTetrisInGameRoom()
             return False
+
+    def fixTetrisInGameRoom(self):
+        for i in range(TETRISDIMENSION):
+            for j in range(TETRISDIMENSION):
+                if self.data[i][j]:
+                    GameRoom[self.y + i][self.x + j] = 1
 
     def rotate(self):
         for i in range(TETRISDIMENSION // 2):

@@ -125,10 +125,34 @@ class App:
         elif self.game.getGameRunningStatus() == 5:
             self.btnStartVar.set("Pause")
             self.game.resume()
+        self.gameCanvas.focus_set()
 
 
     def btnPlaybackClicked(self):
-        print("playback ... ")
+        self.btnStart.config(state = tkinter.DISABLED)
+        self.btnPlayBack.config(state = tkinter.DISABLED)
+        lastID = ""
+        params = {"size":1}
+        if self.cobox.get() == "one":
+            params["sort"] = "scores desc"
+            params["page"] = 1
+        elif self.cobox.get() == "two":
+            params["sort"] = "scores desc"
+            params["page"] = 2
+        elif self.cobox.get() == "three":
+            params["sort"] = "scores desc"
+            params["page"] = 3
+        else:
+            params["sort"] = "create_time desc"
+            params["page"] = 1
+        rs = self.game.dao.select("gameLists", params, ["_id_"])
+        if rs.get("code") and rs.get("code") == 200:
+            lastID = rs.get("rows")[0][0]
+        if len(lastID) > 0:
+            self.game.playback(lastID)
+        else:
+            self.btnStart.config(state = tkinter.ACTIVE)
+            self.btnPlayBack.config(state = tkinter.ACTIVE)
         self.gameCanvas.focus_set()
 
 
