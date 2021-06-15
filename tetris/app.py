@@ -89,7 +89,7 @@ class App:
 
     
     def checkboxClicked(self):
-        self.game.setTickValForAutoPlay(self.autoVal.get())
+        self.game.isAutoRunning = self.autoVal.get()
         self.gameCanvas.focus_set()
 
     def processKeyboardEvent(self, ke):

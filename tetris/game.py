@@ -45,27 +45,29 @@ class Game:
                 elif op == "quit":
                     break
             else:
-                time.sleep(0.01)
+                time.sleep(0.001)
         
     def dbSave(self):
+        originTable = ""
+        ps = []
         while True:
             if not dbQueue.empty():
                 tablename,params = dbQueue.get()
                 if tablename != "quit":
-                    self.dao.insert(tablename, params)
+                    if originTable == "":
+                        originTable = tablename
+                    if originTable != tablename  or len(ps) > 10:
+                        self.dao.insertBatch(originTable, ps)
+                        ps.clear()
+                        originTable = tablename
+                    ps.append(params)
+                    if tablename == "cleanup":
+                        self.dao.insertBatch(originTable, ps)
+                        ps.clear()
                 else:
                     break
             else:
-                time.sleep(0.01)
-
-    def setTickValForAutoPlay(self, isAuto):
-        self.isAutoRunning = isAuto
-        if isAuto:
-            self.tick = Timer(0.1, self.tickoff)
-            self.tick.start()
-        else:
-            self.tick = Timer(self.gameSpeedInterval / 1000, self.tickoff)
-            self.tick.start()
+                time.sleep(0.001)
 
     def start(self):
         self.gameRunningStatus = 1
@@ -87,7 +89,8 @@ class Game:
         for i in range(random.randint(0,4)):
             self.nextTetris.rotate()
 
-        self.setTickValForAutoPlay(self.isAutoRunning)
+        self.tick = Timer(self.gameSpeedInterval * (0 if self.isAutoRunning else 1) / 1000, self.tickoff)
+        self.tick.start()
 
 
     def playback(self, gameID):
@@ -133,7 +136,7 @@ class Game:
             if self.isAutoRunning:
                 self.autoProcessCurBlock()
                 self.generateNext()
-                self.tick = Timer(0.1, self.tickoff)
+                self.tick = Timer(0, self.tickoff)
                 self.tick.start()
             else:
                 opQueue.put('Down')
@@ -206,6 +209,7 @@ class Game:
                     "scores": self.gameScores,
                     "steps": self.stepNum + 1,
                     }))
+                dbQueue.put(("cleanup",{}))
             self.gameRunningStatus = 0
             self.app.setButtonStartState(tkinter.ACTIVE)
             self.app.setButtonPlayBackState(tkinter.ACTIVE)
