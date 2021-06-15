@@ -25,6 +25,7 @@ class Game:
         self.dbSaver = threading.Thread(target=self.dbSave)
         self.dbSaver.start()
         self.records = []
+        self.isAutoRunning = False
 
     def opWork(self):
         while True:

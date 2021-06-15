@@ -4,7 +4,8 @@ from tetris.block import *
 
 
 class Tetris:
-    def __init__(self, canvas, x, y, shape):
+    def __init__(self, canvas, x, y, shape, noTry = None):
+        noTry = True if noTry == None else noTry
         self.x = x
         self.y = y
         self.canvas = canvas
@@ -22,7 +23,8 @@ class Tetris:
         for i, b in enumerate(curShape):
             if b:
                 self.data[1 + i // TETRISDIMENSION][i % TETRISDIMENSION] = 1
-                self.objs.append(Block(canvas, self.x + i % TETRISDIMENSION, self.y + 1 + i // TETRISDIMENSION, self.color))
+                if noTry:
+                    self.objs.append(Block(canvas, self.x + i % TETRISDIMENSION, self.y + 1 + i // TETRISDIMENSION, self.color))
 
     def getTetrisShape(self):
         return self.shape
@@ -45,20 +47,29 @@ class Tetris:
                     return False
         return True
 
-    def moveLeft(self):
+    def moveLeft(self, noTry = None):
+        noTry = True if noTry == None else noTry
         if self.canPlace(self.x - 1, self.y):
-            self.relocate(self.x - 1, self.y)
+            self.relocate(self.x - 1, self.y, noTry)
+            return True
+        else:
+            return False
 
-    def moveRight(self):
+    def moveRight(self, noTry = None):
+        noTry = True if noTry == None else noTry
         if self.canPlace(self.x + 1, self.y):
-            self.relocate(self.x + 1, self.y)
+            self.relocate(self.x + 1, self.y, noTry)
+            return True
+        else:
+            return False
 
     def moveUp(self):
         self.relocate(self.x, self.y - 1)
 
-    def moveDown(self):
+    def moveDown(self, noTry = None):
+        noTry = True if noTry == None else noTry
         if self.canPlace(self.x, self.y + 1):
-            self.relocate(self.x, self.y + 1)
+            self.relocate(self.x, self.y + 1, noTry)
             return True
         else:
             self.fixTetrisInGameRoom()
@@ -70,8 +81,9 @@ class Tetris:
                 if self.data[i][j]:
                     GameRoom[self.y + i][self.x + j] = 1
 
-    def rotate(self, isCheck = None):
-        isCheck = True if isCheck == None else False
+    def rotate(self, isCheck = None, noTry = None):
+        isCheck = True if isCheck == None else isCheck
+        noTry = True if noTry == None else noTry
         if isCheck:
             for i in range(TETRISDIMENSION // 2):
                 lenJ = TETRISDIMENSION - i - 1
@@ -92,7 +104,8 @@ class Tetris:
                 self.data[lenJ][lenI] = self.data[j][lenJ]
                 self.data[j][lenJ] = t
         self.rotateCount += 1
-        self.redraw()
+        if noTry:
+            self.redraw()
         return True
 
     def redraw(self):
@@ -102,9 +115,11 @@ class Tetris:
                 if self.data[i][j]:
                     self.objs.append(Block(self.canvas, self.x + j, self.y + i, self.color))
 
-    def relocate(self, x, y):
-        for block in self.objs:
-            block.relocate(x - self.x, y - self.y)
+    def relocate(self, x, y, noTry = None):
+        noTry = True if noTry == None else noTry
+        if noTry:
+            for block in self.objs:
+                block.relocate(x - self.x, y - self.y)
         self.x = x
         self.y = y
 
