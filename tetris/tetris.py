@@ -81,6 +81,12 @@ class Tetris:
                 if self.data[i][j]:
                     GameRoom[self.y + i][self.x + j] = 1
 
+    def unfixTetrisInGameRoom(self):
+        for i in range(TETRISDIMENSION):
+            for j in range(TETRISDIMENSION):
+                if self.data[i][j]:
+                    GameRoom[self.y + i][self.x + j] = 0
+
     def rotate(self, isCheck = None, noTry = None):
         isCheck = True if isCheck == None else isCheck
         noTry = True if noTry == None else noTry

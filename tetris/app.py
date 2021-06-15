@@ -65,7 +65,8 @@ class App:
         scores.pack(anchor="w")
 
         Label(frame, text = "").pack(anchor="w")
-        Checkbutton(frame, text = "AutoPlay").pack(anchor="w")
+        self.autoVal = tkinter.IntVar()
+        Checkbutton(frame, text = "AutoPlay",variable=self.autoVal, onvalue=1,offvalue=0,command=self.checkboxClicked).pack(anchor="w")
         self.btnStartVar = StringVar()
         self.btnStartVar.set("Start")
         self.btnStart = Button(frame, height=1, width=10, command=self.btnStartClicked, textvariable=self.btnStartVar)
@@ -87,6 +88,10 @@ class App:
         self.gameCanvas.focus_set()
 
     
+    def checkboxClicked(self):
+        self.game.setTickValForAutoPlay(self.autoVal.get())
+        self.gameCanvas.focus_set()
+
     def processKeyboardEvent(self, ke):
         if self.game.getGameRunningStatus() == 1:
             if ke.keysym == 'Left':

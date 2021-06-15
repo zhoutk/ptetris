@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
 
+from math import fabs
 import tkinter
 from tkinter.constants import ALL
 from  tetris.config import *
@@ -57,6 +58,15 @@ class Game:
             else:
                 time.sleep(0.01)
 
+    def setTickValForAutoPlay(self, isAuto):
+        self.isAutoRunning = isAuto
+        if isAuto:
+            self.tick = Timer(0.1, self.tickoff)
+            self.tick.start()
+        else:
+            self.tick = Timer(self.gameSpeedInterval / 1000, self.tickoff)
+            self.tick.start()
+
     def start(self):
         self.gameRunningStatus = 1
         self.gameSpeedInterval = 1000
@@ -77,8 +87,7 @@ class Game:
         for i in range(random.randint(0,4)):
             self.nextTetris.rotate()
 
-        self.tick = Timer(self.gameSpeedInterval / 1000, self.tickoff)
-        self.tick.start()
+        self.setTickValForAutoPlay(self.isAutoRunning)
 
 
     def playback(self, gameID):
@@ -121,9 +130,15 @@ class Game:
 
     def tickoff(self):
         if self.gameRunningStatus == 1:
-            opQueue.put('Down')
-            self.tick = Timer(self.gameSpeedInterval / 1000, self.tickoff)
-            self.tick.start()
+            if self.isAutoRunning:
+                self.autoProcessCurBlock()
+                self.generateNext()
+                self.tick = Timer(0.1, self.tickoff)
+                self.tick.start()
+            else:
+                opQueue.put('Down')
+                self.tick = Timer(self.gameSpeedInterval / 1000, self.tickoff)
+                self.tick.start()
         elif self.gameRunningStatus == 2:
             self.tetris.relocate(self.LocateX, self.LocateY)
             self.tetris.fixTetrisInGameRoom()
@@ -198,7 +213,8 @@ class Game:
     def getGameRunningStatus(self):
         return self.gameRunningStatus
 
-    def clearRows(self):
+    def clearRows(self, noTry = None):
+        noTry = True if noTry == None else noTry
         occupyLines = []
         h = 20
         while h > 0:
@@ -211,7 +227,7 @@ class Game:
             elif allOccupy == 0:
                 break
             h -= 1
-        if len(occupyLines) > 0:
+        if len(occupyLines) > 0 and noTry:
             self.doCleanRows(occupyLines)
         return len(occupyLines)
 
@@ -258,3 +274,69 @@ class Game:
 
     def rotate(self):
         self.tetris.rotate()
+
+    def evaluate(self, t : Tetris):
+        ct = t.y
+        cct = self.clearRows(False)
+        if cct > 1:
+            ct += 10 * (cct - 1)
+        for i in range(TETRISDIMENSION):
+            for j in range(TETRISDIMENSION):
+                if t.data[i][j]:
+                    ct += 1 if t.hasBlock(t.x + j + 1, t.y + i) else 0
+                    ct += 1 if t.hasBlock(t.x + j - 1, t.y + i) else 0
+                    ct += 1 if t.hasBlock(t.x + j, t.y + i + 1) else 0
+                    ct += 1 if t.hasBlock(t.x + j, t.y + i - 1) else 0
+
+                    if i == 3 or t.data[i + 1][j] == 0:
+                        if not t.hasBlock(t.x + j, t.y + i + 1):
+                            ct -=4
+                        else:
+                            k = 2
+                            while t.y + i + k <= 20:
+                                if not t.hasBlock(t.x, t.y + i + k):
+                                    ct -= 1
+                                    break
+                                k += 1
+        return ct
+
+    def autoProcessCurBlock(self):
+        max = 0
+        initX = self.tetris.x
+        initY = self.tetris.y
+        goalX = 0
+        goalY = 0
+        tmp = Tetris(self.canvas,initX,initY,self.tetris.getTetrisShape(),False)
+        rct = self.tetris.getRotateCount() % 4
+        for _ in range(rct):
+            tmp.rotate(False, False)
+        rct = 0
+        for r in range(4):
+            if r > 0:
+                tmp.relocate(initX, initY)
+                tmp.rotate(False, False)
+            while tmp.moveLeft(False):
+                pass
+            flag = True
+            while flag:
+                while tmp.moveDown(False):
+                    pass
+                tmp.fixTetrisInGameRoom()
+                score = self.evaluate(tmp)
+                tmp.unfixTetrisInGameRoom()
+                if score > max:
+                    max = score
+                    goalX = tmp.x
+                    goalY = tmp.y
+                    rct = r
+                elif score == max:
+                    if random.randint(0,2) == 1:
+                        goalX = tmp.x
+                        goalY = tmp.y
+                        rct = r
+                tmp.relocate(tmp.x, initY)
+                flag = tmp.moveRight(False)
+        for _ in range(rct):
+            self.tetris.rotate()
+        self.tetris.relocate(goalX, goalY)
+        self.tetris.fixTetrisInGameRoom()
