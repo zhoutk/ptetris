@@ -53,7 +53,13 @@ class Game:
         while True:
             if not dbQueue.empty():
                 tablename,params = dbQueue.get()
-                if tablename != "quit":
+                if tablename == "_quit_":
+                    break
+                elif tablename == "_over_":
+                    self.dao.insert(originTable, ps[0])
+                    originTable == ""
+                    ps.clear()
+                else:
                     if originTable == "":
                         originTable = tablename
                     if originTable != tablename  or len(ps) > 10:
@@ -61,11 +67,6 @@ class Game:
                         ps.clear()
                         originTable = tablename
                     ps.append(params)
-                    if tablename == "cleanup":
-                        self.dao.insertBatch(originTable, ps)
-                        ps.clear()
-                else:
-                    break
             else:
                 time.sleep(0.001)
 
@@ -209,7 +210,7 @@ class Game:
                     "scores": self.gameScores,
                     "steps": self.stepNum + 1,
                     }))
-                dbQueue.put(("cleanup",{}))
+                dbQueue.put(("_over_",{}))
             self.gameRunningStatus = 0
             self.app.setButtonStartState(tkinter.ACTIVE)
             self.app.setButtonPlayBackState(tkinter.ACTIVE)
