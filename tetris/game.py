@@ -23,43 +23,33 @@ class Game:
         self.nextTetris = None
         self.worker = threading.Thread(target=self.opWork)
         self.worker.start()
-        self.dbSaver = threading.Thread(target=self.dbSave)
-        self.dbSaver.start()
         self.records = []
         self.isAutoRunning = False
 
     def opWork(self):
-        while True:
-            if not opQueue.empty():
-                op = opQueue.get()
-                if op == "Left":
-                    self.moveLeft()
-                elif op == "Right":
-                    self.moveRight()
-                elif op == "Up":
-                    self.rotate()
-                elif op == "Down":
-                    self.moveDown()
-                elif op == "space":
-                    self.moveDownEnd()
-                elif op == "quit":
-                    break
-            else:
-                time.sleep(0.001)
-        
-    def dbSave(self):
         originTable = ""
         ps = []
         while True:
-            if not dbQueue.empty():
-                tablename,params = dbQueue.get()
-                if tablename == "_quit_":
+            if not opQueue.empty():
+                cmd,data = opQueue.get()
+                if cmd == "Left":
+                    self.moveLeft()
+                elif cmd == "Right":
+                    self.moveRight()
+                elif cmd == "Up":
+                    self.rotate()
+                elif cmd == "Down":
+                    self.moveDown()
+                elif cmd == "space":
+                    self.moveDownEnd()
+                elif cmd == "quit":
                     break
-                elif tablename == "_over_":
+                elif cmd == "over":
                     self.dao.insertBatch(originTable, ps)
                     originTable = ""
                     ps.clear()
-                else:
+                elif cmd == "save":
+                    tablename,params = data
                     if originTable == "":
                         originTable = tablename
                     if originTable != tablename  or len(ps) > 10:
@@ -69,6 +59,7 @@ class Game:
                     ps.append(params)
             else:
                 time.sleep(0.001)
+        
 
     def start(self):
         self.gameRunningStatus = 1
@@ -140,7 +131,7 @@ class Game:
                 self.tick = Timer(0, self.tickoff)
                 self.tick.start()
             else:
-                opQueue.put('Down')
+                opQueue.put(('Down',()))
                 self.tick = Timer(self.gameSpeedInterval / 1000, self.tickoff)
                 self.tick.start()
         elif self.gameRunningStatus == 2:
@@ -154,7 +145,7 @@ class Game:
     def generateNext(self):
         self.stepNum += 1
         if self.gameRunningStatus == 1:
-            dbQueue.put(("gameRecords",{
+            opQueue.put(("save",("gameRecords",{
                 "_id_":UID(), 
                 "gameId":self.gameID,
                 "blockType": self.tetris.getTetrisShape(),
@@ -162,7 +153,7 @@ class Game:
                 "LocateX": self.tetris.x,
                 "LocateY": self.tetris.y,
                 "stepId": self.stepNum,
-                }))
+                })))
         cleanLevels = self.clearRows()
         if cleanLevels > 0:
             self.gameLevels += cleanLevels
@@ -194,7 +185,7 @@ class Game:
             self.app.setStartButtonText("Start")
             print("game is over!")
             if self.gameRunningStatus == 1:
-                dbQueue.put(("gameRecords",{
+                opQueue.put(("save",("gameRecords",{
                     "_id_":UID(), 
                     "gameId":self.gameID,
                     "blockType": self.nextTetris.getTetrisShape(),
@@ -202,15 +193,15 @@ class Game:
                     "LocateX": 4,
                     "LocateY": 0,
                     "stepId": self.stepNum + 1,
-                    }))
-                dbQueue.put(("gameLists",{
+                    })))
+                opQueue.put(("save",("gameLists",{
                     "_id_":self.gameID, 
                     "speed": self.gameSpeed,
                     "levels": self.gameLevels,
                     "scores": self.gameScores,
                     "steps": self.stepNum + 1,
-                    }))
-                dbQueue.put(("_over_",{}))
+                    })))
+                opQueue.put(("over",()))
             self.gameRunningStatus = 0
             self.app.setButtonStartState(tkinter.ACTIVE)
             self.app.setButtonPlayBackState(tkinter.ACTIVE)

@@ -93,17 +93,17 @@ class App:
         self.gameCanvas.focus_set()
 
     def processKeyboardEvent(self, ke):
-        if self.game.getGameRunningStatus() == 1:
+        if self.game.getGameRunningStatus() == 1 and self.game.isAutoRunning == 0:
             if ke.keysym == 'Left':
-                opQueue.put('Left')
+                opQueue.put(('Left',()))
             if ke.keysym == 'Right':
-                opQueue.put('Right')
+                opQueue.put(('Right',()))
             if ke.keysym == 'Up':
-                opQueue.put('Up')
+                opQueue.put(('Up',()))
             if ke.keysym == 'Down':
-                opQueue.put('Down')
+                opQueue.put(('Down',()))
             if ke.keysym == 'space':
-                opQueue.put('space')
+                opQueue.put(('space',()))
 
     def setButtonStartState(self, status):
         self.btnStart.config(state = status)
@@ -171,7 +171,6 @@ class App:
         print("timer close.")
         if hasattr(self.game, "tick"):
             self.game.tick.cancel()
-        opQueue.put("quit")
-        dbQueue.put(("_quit_",{}))
+        opQueue.put(("quit",()))
         time.sleep(0.3)
         root.quit()
