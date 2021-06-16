@@ -57,6 +57,16 @@ class Game:
                         ps.clear()
                         originTable = tablename
                     ps.append(params)
+                elif cmd == "setauto":
+                    self.isAutoRunning = data
+                elif cmd == "pause":
+                    self.gameRunningStatus = data
+                elif cmd == "autonext": 
+                    if self.gameRunningStatus == 1 and self.isAutoRunning == 1:
+                        self.autoProcessCurBlock()
+                        self.generateNext()
+                    self.tick = Timer(0, self.tickoff)
+                    self.tick.start()
             else:
                 time.sleep(0.001)
         
@@ -116,20 +126,17 @@ class Game:
             self.app.setButtonPlayBackState(tkinter.ACTIVE)
 
     def pause(self):
-        self.gameRunningStatus = 5
+        opQueue.put(("pause",5))
 
     def resume(self):
         self.gameRunningStatus = 1  
-        self.tick = Timer(self.gameSpeedInterval / 1000, self.tickoff)
+        self.tick = Timer(self.gameSpeedInterval * (0 if self.isAutoRunning else 1) / 1000, self.tickoff)
         self.tick.start()      
 
     def tickoff(self):
         if self.gameRunningStatus == 1:
             if self.isAutoRunning:
-                self.autoProcessCurBlock()
-                self.generateNext()
-                self.tick = Timer(0, self.tickoff)
-                self.tick.start()
+                opQueue.put(("autonext",()))
             else:
                 opQueue.put(('Down',()))
                 self.tick = Timer(self.gameSpeedInterval / 1000, self.tickoff)
@@ -141,70 +148,70 @@ class Game:
             self.tick = Timer(0, self.tickoff)
             self.tick.start()
 
-
     def generateNext(self):
-        self.stepNum += 1
-        if self.gameRunningStatus == 1:
-            opQueue.put(("save",("gameRecords",{
-                "_id_":UID(), 
-                "gameId":self.gameID,
-                "blockType": self.tetris.getTetrisShape(),
-                "rotateNumber": self.tetris.getRotateCount(),
-                "LocateX": self.tetris.x,
-                "LocateY": self.tetris.y,
-                "stepId": self.stepNum,
-                })))
-        cleanLevels = self.clearRows()
-        if cleanLevels > 0:
-            self.gameLevels += cleanLevels
-            self.gameScores += SCORES[cleanLevels]
-            if self.gameScores / STEPUPSCORE >= self.gameSpeed:
-                self.gameSpeed += 1
-                self.gameSpeedInterval -= STEPUPINTERVAL
-            self.app.updateGameInfo(self.gameSpeed, self.gameLevels, self.gameScores)
-        self.tetris = Tetris(self.canvas, 4, 0, self.nextTetris.getTetrisShape())
-        for i in range(self.nextTetris.getRotateCount()):
-            if not self.tetris.rotate():
-                break
-        if self.tetris.canPlace(4, 0):
-            self.nextCanvas.delete(ALL)
-            initRotate = 0
-            if self.gameRunningStatus == 1:
-                self.nextTetris = Tetris(self.nextCanvas, 1, 1, random.randint(0,6))
-                initRotate = random.randint(0,4)
-            else:
-                blockType,rotateNumber,self.LocateX,self.LocateY,stepId = self.records[self.stepNum - 1]
-                self.tetris.relocate(self.LocateX, self.tetris.y)
-                blockType,rotateNumber,LocateX,LocateY,stepId = self.records[self.stepNum]
-                self.nextTetris = Tetris(self.nextCanvas, 1,1, blockType)
-                initRotate = rotateNumber
-            for i in range(initRotate):
-                self.nextTetris.rotate(False)
-        else:
-            self.canvas.create_text(150, 200, text = "Game is over!", fill="white", font = "Times 28 italic bold")
-            self.app.setStartButtonText("Start")
-            print("game is over!")
+        if self.gameRunningStatus == 1 or self.gameRunningStatus == 2:
+            self.stepNum += 1
             if self.gameRunningStatus == 1:
                 opQueue.put(("save",("gameRecords",{
                     "_id_":UID(), 
                     "gameId":self.gameID,
-                    "blockType": self.nextTetris.getTetrisShape(),
-                    "rotateNumber": self.nextTetris.getRotateCount(),
-                    "LocateX": 4,
-                    "LocateY": 0,
-                    "stepId": self.stepNum + 1,
+                    "blockType": self.tetris.getTetrisShape(),
+                    "rotateNumber": self.tetris.getRotateCount(),
+                    "LocateX": self.tetris.x,
+                    "LocateY": self.tetris.y,
+                    "stepId": self.stepNum,
                     })))
-                opQueue.put(("save",("gameLists",{
-                    "_id_":self.gameID, 
-                    "speed": self.gameSpeed,
-                    "levels": self.gameLevels,
-                    "scores": self.gameScores,
-                    "steps": self.stepNum + 1,
-                    })))
-                opQueue.put(("over",()))
-            self.gameRunningStatus = 0
-            self.app.setButtonStartState(tkinter.ACTIVE)
-            self.app.setButtonPlayBackState(tkinter.ACTIVE)
+            cleanLevels = self.clearRows()
+            if cleanLevels > 0:
+                self.gameLevels += cleanLevels
+                self.gameScores += SCORES[cleanLevels]
+                if self.gameScores / STEPUPSCORE >= self.gameSpeed:
+                    self.gameSpeed += 1
+                    self.gameSpeedInterval -= STEPUPINTERVAL
+                self.app.updateGameInfo(self.gameSpeed, self.gameLevels, self.gameScores)
+            self.tetris = Tetris(self.canvas, 4, 0, self.nextTetris.getTetrisShape())
+            for i in range(self.nextTetris.getRotateCount()):
+                if not self.tetris.rotate():
+                    break
+            if self.tetris.canPlace(4, 0):
+                self.nextCanvas.delete(ALL)
+                initRotate = 0
+                if self.gameRunningStatus == 1:
+                    self.nextTetris = Tetris(self.nextCanvas, 1, 1, random.randint(0,6))
+                    initRotate = random.randint(0,4)
+                else:
+                    blockType,rotateNumber,self.LocateX,self.LocateY,stepId = self.records[self.stepNum - 1]
+                    self.tetris.relocate(self.LocateX, self.tetris.y)
+                    blockType,rotateNumber,LocateX,LocateY,stepId = self.records[self.stepNum]
+                    self.nextTetris = Tetris(self.nextCanvas, 1,1, blockType)
+                    initRotate = rotateNumber
+                for i in range(initRotate):
+                    self.nextTetris.rotate(False)
+            else:
+                self.canvas.create_text(150, 200, text = "Game is over!", fill="white", font = "Times 28 italic bold")
+                self.app.setStartButtonText("Start")
+                print("game is over!")
+                if self.gameRunningStatus == 1:
+                    opQueue.put(("save",("gameRecords",{
+                        "_id_":UID(), 
+                        "gameId":self.gameID,
+                        "blockType": self.nextTetris.getTetrisShape(),
+                        "rotateNumber": self.nextTetris.getRotateCount(),
+                        "LocateX": 4,
+                        "LocateY": 0,
+                        "stepId": self.stepNum + 1,
+                        })))
+                    opQueue.put(("save",("gameLists",{
+                        "_id_":self.gameID, 
+                        "speed": self.gameSpeed,
+                        "levels": self.gameLevels,
+                        "scores": self.gameScores,
+                        "steps": self.stepNum + 1,
+                        })))
+                    opQueue.put(("over",()))
+                self.gameRunningStatus = 0
+                self.app.setButtonStartState(tkinter.ACTIVE)
+                self.app.setButtonPlayBackState(tkinter.ACTIVE)
                 
     def getGameRunningStatus(self):
         return self.gameRunningStatus
