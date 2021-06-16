@@ -86,6 +86,7 @@ class Game:
         self.canvas.delete(ALL)
         self.nextCanvas.delete(ALL)
         initGameRoom()
+        self.app.stepsVar.set(1)
 
         self.gameID = UID()
         self.tetris = Tetris(self.canvas, 4, 0, random.randint(0,6))
@@ -113,6 +114,7 @@ class Game:
         self.canvas.delete(ALL)
         self.nextCanvas.delete(ALL)
         initGameRoom()
+        self.app.stepsVar.set(1)
 
         if len(self.records) > 2:
             blockType,rotateNumber,self.LocateX,self.LocateY,stepId = self.records[0]
@@ -138,6 +140,7 @@ class Game:
         self.tick.start()      
 
     def tickoff(self):
+        self.app.stepsVar.set(self.stepNum + 1)
         if self.gameRunningStatus == 1:
             if self.isAutoRunning:
                 opQueue.put(("autonext",()))

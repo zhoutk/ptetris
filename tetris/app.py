@@ -49,6 +49,10 @@ class App:
         frame = Frame(root)
         frame.place(x = 330, y = 160)
 
+        Label(frame, text="STEPS:").pack(anchor="w")
+        self.stepsVar = StringVar()
+        Label(frame, height=1, width=12, relief=SUNKEN, bd=1, textvariable=self.stepsVar).pack(anchor="w")
+
         Label(frame, text = "SPEED:").pack(anchor="w")
         self.speedVar = StringVar()
         speed = Label(frame, height=1, width=12, relief=SUNKEN, bd=1, textvariable=self.speedVar)
