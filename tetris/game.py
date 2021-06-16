@@ -66,9 +66,9 @@ class Game:
                 elif cmd == "autonext": 
                     if self.gameRunningStatus == 1 and self.isAutoRunning == 1:
                         self.autoProcessCurBlock()
-                        self.generateNext()
-                    self.tick = Timer(AUTOINTERVAL, self.tickoff)
-                    self.tick.start()
+                        if self.generateNext():
+                            self.tick = Timer(AUTOINTERVAL, self.tickoff)
+                            self.tick.start()
             else:
                 time.sleep(WORKINTERVAL)
     
@@ -174,9 +174,8 @@ class Game:
                     self.gameSpeedInterval -= STEPUPINTERVAL
                 self.app.updateGameInfo(self.gameSpeed, self.gameLevels, self.gameScores)
             self.tetris = Tetris(self.canvas, 4, 0, self.nextTetris.getTetrisShape())
-            for i in range(self.nextTetris.getRotateCount()):
-                if not self.tetris.rotate(False):
-                    break
+            for _ in range(self.nextTetris.getRotateCount()):
+                self.tetris.rotate(False)
             if self.tetris.canPlace(4, 0):
                 self.nextCanvas.delete(ALL)
                 initRotate = 0
@@ -189,8 +188,9 @@ class Game:
                     blockType,rotateNumber,LocateX,LocateY,stepId = self.records[self.stepNum]
                     self.nextTetris = Tetris(self.nextCanvas, 1,1, blockType)
                     initRotate = rotateNumber
-                for i in range(initRotate):
+                for _ in range(initRotate):
                     self.nextTetris.rotate(False)
+                return True
             else:
                 self.canvas.create_text(150, 200, text = "Game is over!", fill="white", font = "Times 28 italic bold")
                 self.app.setStartButtonText("Start")
@@ -216,6 +216,9 @@ class Game:
                 self.gameRunningStatus = 0
                 self.app.setButtonStartState(tkinter.ACTIVE)
                 self.app.setButtonPlayBackState(tkinter.ACTIVE)
+                return False
+
+        return False
                 
     def getGameRunningStatus(self):
         return self.gameRunningStatus
