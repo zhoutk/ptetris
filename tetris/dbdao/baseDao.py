@@ -1,4 +1,5 @@
 from tkinter.constants import NO
+from typing import List
 from tetris.dbdao import dbhelper
 
 class BaseDao(object):
@@ -28,7 +29,7 @@ class BaseDao(object):
     def execSql(self, sql, values = []):
         return dbhelper.exec_sql(sql, values)
 
-    def insertBatch(self, tablename, elements = []):
+    def insertBatch(self, tablename, elements : List):
         return dbhelper.insertBatch(tablename,elements)
 
     def transGo(elements = [], isAsync = False):

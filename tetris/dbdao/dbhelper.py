@@ -1,5 +1,6 @@
 import sqlite3 as dbHandle
 import os
+from typing import List
 
 def exec_sql(sql, values, opType = 0):
     try:
@@ -174,7 +175,12 @@ def select(tablename, params={}, fields=None, sql = None, values = None):
     else:
         return {"code": 602, "error": rs[1].args[0], "total": rs[2]}
 
-def insertBatch(tablename, elements=[]):
+def insertBatch(tablename, elements : List):
+    if len(elements) == 0:
+        return {"code": 201, "info": "There is no elements exist.", "total": 0}
+    elif len(elements) == 1:
+        return insert(tablename, elements[0])
+
     sql = "insert into %s ( " % tablename
     isFirst = True
     vs = []

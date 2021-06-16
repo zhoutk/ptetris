@@ -56,8 +56,8 @@ class Game:
                 if tablename == "_quit_":
                     break
                 elif tablename == "_over_":
-                    self.dao.insert(originTable, ps[0])
-                    originTable == ""
+                    self.dao.insertBatch(originTable, ps)
+                    originTable = ""
                     ps.clear()
                 else:
                     if originTable == "":
