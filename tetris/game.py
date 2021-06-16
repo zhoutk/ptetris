@@ -175,7 +175,7 @@ class Game:
                 self.app.updateGameInfo(self.gameSpeed, self.gameLevels, self.gameScores)
             self.tetris = Tetris(self.canvas, 4, 0, self.nextTetris.getTetrisShape())
             for i in range(self.nextTetris.getRotateCount()):
-                if not self.tetris.rotate():
+                if not self.tetris.rotate(False):
                     break
             if self.tetris.canPlace(4, 0):
                 self.nextCanvas.delete(ALL)
@@ -344,6 +344,6 @@ class Game:
                 tmp.relocate(tmp.x, initY)
                 flag = tmp.moveRight(False)
         for _ in range(rct):
-            self.tetris.rotate()
+            self.tetris.rotate(False)
         self.tetris.relocate(goalX, goalY)
         self.tetris.fixTetrisInGameRoom()
