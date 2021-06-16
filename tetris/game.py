@@ -10,6 +10,7 @@ from threading import Timer
 import threading
 import time
 from tetris.dbdao.baseDao import *
+import copy
 
 class Game:
     def __init__(self, canvas, nextCanvas, app = None) -> None:
@@ -53,7 +54,8 @@ class Game:
                     if originTable == "":
                         originTable = tablename
                     if originTable != tablename  or len(ps) > 10:
-                        self.dao.insertBatch(originTable, ps)
+                        savePs = copy.deepcopy(ps)
+                        Timer(0, self.doSaveRecords,(originTable, savePs)).start()
                         ps.clear()
                         originTable = tablename
                     ps.append(params)
@@ -65,11 +67,13 @@ class Game:
                     if self.gameRunningStatus == 1 and self.isAutoRunning == 1:
                         self.autoProcessCurBlock()
                         self.generateNext()
-                    self.tick = Timer(0, self.tickoff)
+                    self.tick = Timer(AUTOINTERVAL, self.tickoff)
                     self.tick.start()
             else:
-                time.sleep(0.001)
-        
+                time.sleep(WORKINTERVAL)
+    
+    def doSaveRecords(self, tablename, ps):
+        self.dao.insertBatch(tablename, ps)
 
     def start(self):
         self.gameRunningStatus = 1
@@ -119,7 +123,7 @@ class Game:
             self.nextTetris = Tetris(self.nextCanvas, 1, 1, blockType)
             for i in range(rotateNumber % 4):
                 self.nextTetris.rotate()
-            self.tick = Timer(0, self.tickoff)
+            self.tick = Timer(BACKINTERVAL, self.tickoff)
             self.tick.start()
         else:
             self.app.setButtonStartState(tkinter.ACTIVE)
@@ -145,7 +149,7 @@ class Game:
             self.tetris.relocate(self.LocateX, self.LocateY)
             self.tetris.fixTetrisInGameRoom()
             self.generateNext()
-            self.tick = Timer(0, self.tickoff)
+            self.tick = Timer(BACKINTERVAL, self.tickoff)
             self.tick.start()
 
     def generateNext(self):

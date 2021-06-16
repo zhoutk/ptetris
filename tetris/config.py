@@ -2,6 +2,9 @@ import uuid
 from queue import Queue
 
 opQueue = Queue()
+WORKINTERVAL = 0.001
+AUTOINTERVAL = 0
+BACKINTERVAL = 0
 
 TETRISDIMENSION = 4
 BLOCKSIDEWIDTH = 30
