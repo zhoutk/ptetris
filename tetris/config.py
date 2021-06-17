@@ -1,4 +1,4 @@
-import uuid
+from tetris.common.snowflake import IdWorker
 from queue import Queue
 
 opQueue = Queue()
@@ -45,5 +45,7 @@ def initGameRoom():
             else:
                 GameRoom[i][j] = 0
 
+worker = IdWorker()
+
 def UID():
-    return str(uuid.uuid1()).split("-")[0]
+    return worker.get_id()
