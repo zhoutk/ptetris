@@ -151,9 +151,9 @@ class Game:
         elif self.gameRunningStatus == 2:
             self.tetris.relocate(self.LocateX, self.LocateY)
             self.tetris.fixTetrisInGameRoom()
-            self.generateNext()
-            self.tick = Timer(BACKINTERVAL, self.tickoff)
-            self.tick.start()
+            if self.generateNext():
+                self.tick = Timer(BACKINTERVAL, self.tickoff)
+                self.tick.start()
 
     def generateNext(self):
         if self.gameRunningStatus == 1 or self.gameRunningStatus == 2:
@@ -187,6 +187,13 @@ class Game:
                     initRotate = random.randint(0,4)
                 else:
                     blockType,rotateNumber,self.LocateX,self.LocateY,stepId = self.records[self.stepNum - 1]
+                    if self.stepNum != stepId:
+                        print("Error: play history records error, should be ", self.stepNum, ", but it's ",stepId)
+                        self.canvas.create_text(150, 200, text = "Records error!", fill="white", font = "Times 28 italic bold")
+                        self.gameRunningStatus = 0
+                        self.app.setButtonStartState(tkinter.ACTIVE)
+                        self.app.setButtonPlayBackState(tkinter.ACTIVE)
+                        return False
                     self.tetris.relocate(self.LocateX, self.tetris.y)
                     blockType,rotateNumber,LocateX,LocateY,stepId = self.records[self.stepNum]
                     self.nextTetris = Tetris(self.nextCanvas, 1,1, blockType)
