@@ -3,7 +3,7 @@
 from math import fabs
 import tkinter
 from tkinter.constants import ALL
-from  tetris.config import *
+from tetris.config import *
 from tetris.tetris import Tetris
 import random
 from threading import Timer
