@@ -2,6 +2,11 @@ from tetris.common.snowflake import IdWorker
 from queue import Queue
 
 opQueue = Queue()
+blockQueue = Queue()
+canvasText = {}
+
+SCREENOFFSET = 500
+
 WORKINTERVAL = 0.001
 AUTOINTERVAL = 0
 BACKINTERVAL = 0

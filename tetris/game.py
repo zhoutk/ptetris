@@ -84,8 +84,8 @@ class Game:
         self.gameScores = 0
         self.stepNum = 0
         self.app.updateGameInfo(1,0,0)
-        self.canvas.delete(ALL)
-        self.nextCanvas.delete(ALL)
+        self.canvas.move(ALL, SCREENOFFSET, 0)
+        self.nextCanvas.move(ALL,SCREENOFFSET, 0)
         initGameRoom()
         self.app.stepsVar.set(1)
 
@@ -190,7 +190,12 @@ class Game:
                     blockType,rotateNumber,self.LocateX,self.LocateY,stepId = self.records[self.stepNum - 1]
                     if self.stepNum != stepId:
                         print("Error: play history records error, should be ", self.stepNum, ", but it's ",stepId)
-                        self.canvas.create_text(150, 200, text = "Records error!", fill="white", font = "Times 28 italic bold")
+                        textErr = canvasText.get("record-error")
+                        if textErr == None:
+                            canvasText["record-error"] = self.canvas.create_text(150, 200, text = "Records error!", fill="white", font = "Times 28 italic bold")
+                        else:
+                            self.canvas.move(textErr, -SCREENOFFSET, 0)
+                            self.canvas.tag_raise(textErr)
                         self.gameRunningStatus = 0
                         self.app.setButtonStartState(tkinter.ACTIVE)
                         self.app.setButtonPlayBackState(tkinter.ACTIVE)
@@ -203,7 +208,12 @@ class Game:
                     self.nextTetris.rotate(False)
                 return True
             else:
-                self.canvas.create_text(150, 200, text = "Game is over!", fill="white", font = "Times 28 italic bold")
+                textOver = canvasText.get("game-over")
+                if textOver == None:
+                    canvasText["game-over"] = self.canvas.create_text(150, 200, text = "Game is over!", fill="white", font = "Times 28 italic bold")
+                else:
+                    self.canvas.move(textOver, -SCREENOFFSET, 0)
+                    self.canvas.tag_raise(textOver)
                 self.app.setStartButtonText("Start")
                 print("game is over!")
                 if self.gameRunningStatus == 1:
