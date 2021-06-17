@@ -46,7 +46,8 @@ class Game:
                 elif cmd == "quit":
                     break
                 elif cmd == "over":
-                    self.dao.insertBatch(originTable, ps)
+                    overPs = copy.deepcopy(ps)
+                    Timer(0, self.doSaveRecords,(originTable, overPs)).start()
                     originTable = ""
                     ps.clear()
                 elif cmd == "save":
@@ -56,8 +57,8 @@ class Game:
                     if originTable != tablename  or len(ps) > 10:
                         savePs = copy.deepcopy(ps)
                         Timer(0, self.doSaveRecords,(originTable, savePs)).start()
-                        ps.clear()
                         originTable = tablename
+                        ps.clear()
                     ps.append(params)
                 elif cmd == "setauto":
                     self.isAutoRunning = data
