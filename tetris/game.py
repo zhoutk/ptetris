@@ -327,7 +327,8 @@ class Game:
         for r in range(4):
             if r > 0:
                 tmp.relocate(initX, initY)
-                tmp.rotate(False, False)
+                if not tmp.rotate(True, False):
+                    break
             while tmp.moveLeft(False):
                 pass
             flag = True
