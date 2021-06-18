@@ -1,6 +1,7 @@
 from tetris.common.snowflake import IdWorker
 from queue import Queue
 
+TetrisCounter = [0,0,0,0,0,0,0,0]
 opQueue = Queue()
 blockQueue = Queue()
 canvasText = {}
@@ -34,6 +35,9 @@ TETRISCOLORS = (
     "darkCyan",
     "darkBlue"
 )
+
+allCanvasBlocks = []
+nextCanvasBlocks = []
 
 SCORES = (0,1,3,7,10)
 

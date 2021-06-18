@@ -5,6 +5,8 @@ import tkinter
 from tkinter.constants import ALL
 from tetris.config import *
 from tetris.tetris import Tetris
+from tetris.nexTetris import NexTetris
+from tetris.nextBlock import NextBlock
 import random
 from threading import Timer
 import threading
@@ -20,6 +22,8 @@ class Game:
         self.gameRunningStatus = 0
         self.canvas = canvas
         self.nextCanvas = nextCanvas
+        for _ in range(4):
+            nextCanvasBlocks.append(NextBlock(nextCanvas, SCREENOFFSET, 0, "red"))
         self.tetris = None
         self.nextTetris = None
         self.worker = threading.Thread(target=self.opWork)
@@ -76,6 +80,12 @@ class Game:
     def doSaveRecords(self, tablename, ps):
         self.dao.insertBatch(tablename, ps)
 
+    def initBlockQueue(self):
+        while not blockQueue.empty():
+            blockQueue.get()
+        for b in allCanvasBlocks:
+            blockQueue.put(b)
+
     def start(self):
         self.gameRunningStatus = 1
         self.gameSpeedInterval = 1000
@@ -85,16 +95,16 @@ class Game:
         self.stepNum = 0
         self.app.updateGameInfo(1,0,0)
         self.canvas.move(ALL, SCREENOFFSET, 0)
-        self.nextCanvas.move(ALL,SCREENOFFSET, 0)
         initGameRoom()
+        self.initBlockQueue()
         self.app.stepsVar.set(1)
 
         self.gameID = UID()
         self.tetris = Tetris(self.canvas, 4, 0, random.randint(0,6))
-        for i in range(random.randint(0,4)):
+        for _ in range(random.randint(0,4)):
             self.tetris.rotate()
-        self.nextTetris = Tetris(self.nextCanvas, 1, 1, random.randint(0,6))
-        for i in range(random.randint(0,4)):
+        self.nextTetris = NexTetris(random.randint(0,6))
+        for _ in range(random.randint(0,4)):
             self.nextTetris.rotate()
 
         self.tick = Timer(self.gameSpeedInterval * (0 if self.isAutoRunning else 1) / 1000, self.tickoff)
@@ -112,19 +122,19 @@ class Game:
         self.gameScores = 0
         self.stepNum = 1
         self.app.updateGameInfo(1,0,0)
-        self.canvas.delete(ALL)
-        self.nextCanvas.delete(ALL)
+        self.canvas.move(ALL, SCREENOFFSET, 0)
         initGameRoom()
+        self.initBlockQueue()
         self.app.stepsVar.set(1)
 
         if len(self.records) > 2:
             blockType,rotateNumber,self.LocateX,self.LocateY,stepId = self.records[0]
             self.tetris = Tetris(self.canvas, 4, 0,blockType)
-            for i in range(rotateNumber % 4):
+            for _ in range(rotateNumber % 4):
                 self.tetris.rotate()
             blockType,rotateNumber,LocateX,LocateY,stepId = self.records[1]
-            self.nextTetris = Tetris(self.nextCanvas, 1, 1, blockType)
-            for i in range(rotateNumber % 4):
+            self.nextTetris = NexTetris(blockType)
+            for _ in range(rotateNumber % 4):
                 self.nextTetris.rotate()
             self.tick = Timer(BACKINTERVAL, self.tickoff)
             self.tick.start()
@@ -181,10 +191,9 @@ class Game:
             for _ in range(self.nextTetris.getRotateCount()):
                 self.tetris.rotate(False)
             if self.tetris.canPlace(4, 0):
-                self.nextCanvas.delete(ALL)
                 initRotate = 0
                 if self.gameRunningStatus == 1:
-                    self.nextTetris = Tetris(self.nextCanvas, 1, 1, random.randint(0,6))
+                    self.nextTetris = NexTetris(random.randint(0,6))
                     initRotate = random.randint(0,4)
                 else:
                     blockType,rotateNumber,self.LocateX,self.LocateY,stepId = self.records[self.stepNum - 1]
@@ -202,10 +211,10 @@ class Game:
                         return False
                     self.tetris.relocate(self.LocateX, self.tetris.y)
                     blockType,rotateNumber,LocateX,LocateY,stepId = self.records[self.stepNum]
-                    self.nextTetris = Tetris(self.nextCanvas, 1,1, blockType)
+                    self.nextTetris = NexTetris(blockType)
                     initRotate = rotateNumber
                 for _ in range(initRotate):
-                    self.nextTetris.rotate(False)
+                    self.nextTetris.rotate()
                 return True
             else:
                 textOver = canvasText.get("game-over")
@@ -271,7 +280,8 @@ class Game:
                 for j in range(1, 11):
                     GameRoom[h][j] = 0
                     for b in self.canvas.find_closest(j * BLOCKSIDEWIDTH - HALFBLOCKWIDTH, h  * BLOCKSIDEWIDTH - HALFBLOCKWIDTH):
-                        self.canvas.delete(b)
+                        self.canvas.move(b, SCREENOFFSET, 0)
+                        blockQueue.put(b)
             else:
                 count = 0
                 for j in range(1, 11):
