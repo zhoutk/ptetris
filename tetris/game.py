@@ -7,12 +7,9 @@ from tetris.config import *
 from tetris.tetris import Tetris
 from tetris.nexTetris import NexTetris
 from tetris.nextBlock import NextBlock
-import random
 from threading import Timer
-import threading
-import time
 from tetris.dbdao.baseDao import *
-import copy
+import random, threading, time, copy, gc, tracemalloc
 
 class Game:
     def __init__(self, canvas, nextCanvas, app = None) -> None:
@@ -30,6 +27,8 @@ class Game:
         self.worker.start()
         self.records = []
         self.isAutoRunning = False
+        tracemalloc.start()
+        self.snapshot1 = tracemalloc.take_snapshot()
 
     def opWork(self):
         originTable = ""
@@ -72,6 +71,7 @@ class Game:
                     if self.gameRunningStatus == 1 and self.isAutoRunning == 1:
                         self.autoProcessCurBlock()
                         if self.generateNext():
+                            del self.tick
                             self.tick = Timer(AUTOINTERVAL, self.tickoff)
                             self.tick.start()
             else:
@@ -79,12 +79,20 @@ class Game:
     
     def doSaveRecords(self, tablename, ps):
         self.dao.insertBatch(tablename, ps)
+        del ps
 
     def initBlockQueue(self):
+        gc.collect()
         while not blockQueue.empty():
             blockQueue.get()
         for b in allCanvasBlocks:
             blockQueue.put(b)
+        self.snapshot2 = tracemalloc.take_snapshot()
+        top_stats = self.snapshot2.compare_to(self.snapshot1, 'lineno')
+        print("[ Top 10 differences ]")
+        for stat in top_stats[:10]:
+            print(stat)
+        print("------------------------------")
 
     def start(self):
         self.gameRunningStatus = 1
@@ -187,12 +195,14 @@ class Game:
                     self.gameSpeed += 1
                     self.gameSpeedInterval -= STEPUPINTERVAL
                 self.app.updateGameInfo(self.gameSpeed, self.gameLevels, self.gameScores)
+            del self.tetris
             self.tetris = Tetris(self.canvas, 4, 0, self.nextTetris.getTetrisShape())
             for _ in range(self.nextTetris.getRotateCount()):
                 self.tetris.rotate(False)
             if self.tetris.canPlace(4, 0):
                 initRotate = 0
                 if self.gameRunningStatus == 1:
+                    del self.nextTetris
                     self.nextTetris = NexTetris(random.randint(0,6))
                     initRotate = random.randint(0,4)
                 else:
@@ -224,7 +234,8 @@ class Game:
                     self.canvas.move(textOver, -SCREENOFFSET, 0)
                     self.canvas.tag_raise(textOver)
                 self.app.setStartButtonText("Start")
-                print("game is over!")
+                TetrisCounter[1] += 1
+                print("game is over! This the ",TetrisCounter[1]," times.")
                 if self.gameRunningStatus == 1:
                     opQueue.put(("save",("gameRecords",{
                         "_id_":UID(), 
@@ -246,6 +257,7 @@ class Game:
                 self.gameRunningStatus = 0
                 self.app.setButtonStartState(tkinter.ACTIVE)
                 self.app.setButtonPlayBackState(tkinter.ACTIVE)
+                self.app.btnStartClicked()
                 return False
 
         return False
@@ -378,6 +390,7 @@ class Game:
                         rct = r
                 tmp.relocate(tmp.x, initY)
                 flag = tmp.moveRight(False)
+        del tmp
         for _ in range(rct):
             self.tetris.rotate(False)
         self.tetris.relocate(goalX, goalY)
