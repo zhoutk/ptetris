@@ -3,14 +3,17 @@ from queue import Queue
 
 TetrisCounter = [0,0,0,0,0,0,0,0]
 opQueue = Queue()
+dbQueue = Queue()
 blockQueue = Queue()
 canvasText = {}
 
 SCREENOFFSET = 500
 
 WORKINTERVAL = 0.001
-AUTOINTERVAL = 0
-BACKINTERVAL = 0
+SAVEINTERVAL = 0.01
+
+AUTOINTERVAL = 1
+BACKINTERVAL = 1
 
 TETRISDIMENSION = 4
 BLOCKSIDEWIDTH = 30

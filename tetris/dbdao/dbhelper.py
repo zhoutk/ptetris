@@ -18,7 +18,7 @@ def exec_sql(sql, values, opType = 0):
             result = cur.fetchall()
         else:
             conn.commit()
-        # print('Sql: ', sql, ' Values: ', values)
+        print('Sql: ', sql, ' Values: ', values)
     except Exception as err:
         flag = True
         error = err

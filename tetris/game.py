@@ -15,7 +15,7 @@ from tetris.dbdao.baseDao import *
 import copy
 
 class Game:
-    def __init__(self, canvas, nextCanvas, app = None) -> None:
+    def __init__(self, canvas:tkinter.Canvas, nextCanvas, app = None) -> None:
         self.app = app
         self.stepNum = 0
         self.dao = BaseDao()
@@ -28,6 +28,8 @@ class Game:
         self.nextTetris = None
         self.worker = threading.Thread(target=self.opWork)
         self.worker.start()
+        self.saver = threading.Thread(target=self.doSaveRecords)
+        self.saver.start()
         self.records = []
         self.isAutoRunning = False
 
@@ -50,8 +52,8 @@ class Game:
                 elif cmd == "quit":
                     break
                 elif cmd == "over":
-                    overPs = copy.deepcopy(ps)
-                    Timer(0, self.doSaveRecords,(originTable, overPs)).start()
+                    savePs = copy.deepcopy(ps)
+                    dbQueue.put(("save", (originTable, savePs)))
                     originTable = ""
                     ps.clear()
                 elif cmd == "save":
@@ -60,7 +62,7 @@ class Game:
                         originTable = tablename
                     if originTable != tablename  or len(ps) > 10:
                         savePs = copy.deepcopy(ps)
-                        Timer(0, self.doSaveRecords,(originTable, savePs)).start()
+                        dbQueue.put(("save", (originTable, savePs)))
                         originTable = tablename
                         ps.clear()
                     ps.append(params)
@@ -72,13 +74,21 @@ class Game:
                     if self.gameRunningStatus == 1 and self.isAutoRunning == 1:
                         self.autoProcessCurBlock()
                         if self.generateNext():
-                            self.tick = Timer(AUTOINTERVAL, self.tickoff)
-                            self.tick.start()
+                            self.canvas.after(AUTOINTERVAL, self.tickoff)
             else:
                 time.sleep(WORKINTERVAL)
     
-    def doSaveRecords(self, tablename, ps):
-        self.dao.insertBatch(tablename, ps)
+    def doSaveRecords(self):
+        while True:
+            if not dbQueue.empty():
+                cmd,data = dbQueue.get()
+                if cmd == "save":
+                    tablename,params = data
+                    self.dao.insertBatch(tablename, params)
+                elif cmd == "quit":
+                    break
+            else:
+                time.sleep(SAVEINTERVAL)
 
     def initBlockQueue(self):
         while not blockQueue.empty():
@@ -107,8 +117,7 @@ class Game:
         for _ in range(random.randint(0,4)):
             self.nextTetris.rotate()
 
-        self.tick = Timer(self.gameSpeedInterval * (0 if self.isAutoRunning else 1) / 1000, self.tickoff)
-        self.tick.start()
+        self.canvas.after(self.gameSpeedInterval * (0 if self.isAutoRunning else 1), self.tickoff)
 
 
     def playback(self, gameID):
@@ -136,8 +145,7 @@ class Game:
             self.nextTetris = NexTetris(blockType)
             for _ in range(rotateNumber % 4):
                 self.nextTetris.rotate()
-            self.tick = Timer(BACKINTERVAL, self.tickoff)
-            self.tick.start()
+            self.canvas.after(BACKINTERVAL, self.tickoff)
         else:
             self.app.setButtonStartState(tkinter.ACTIVE)
             self.app.setButtonPlayBackState(tkinter.ACTIVE)
@@ -147,8 +155,7 @@ class Game:
 
     def resume(self):
         self.gameRunningStatus = 1  
-        self.tick = Timer(self.gameSpeedInterval * (0 if self.isAutoRunning else 1) / 1000, self.tickoff)
-        self.tick.start()      
+        self.canvas.after(self.gameSpeedInterval * (0 if self.isAutoRunning else 1), self.tickoff)
 
     def tickoff(self):
         self.app.stepsVar.set(self.stepNum + 1)
@@ -157,14 +164,12 @@ class Game:
                 opQueue.put(("autonext",()))
             else:
                 opQueue.put(('Down',()))
-                self.tick = Timer(self.gameSpeedInterval / 1000, self.tickoff)
-                self.tick.start()
+                self.canvas.after(self.gameSpeedInterval, self.tickoff)
         elif self.gameRunningStatus == 2:
             self.tetris.relocate(self.LocateX, self.LocateY)
             self.tetris.fixTetrisInGameRoom()
             if self.generateNext():
-                self.tick = Timer(BACKINTERVAL, self.tickoff)
-                self.tick.start()
+                self.canvas.after(BACKINTERVAL, self.tickoff)
 
     def generateNext(self):
         if self.gameRunningStatus == 1 or self.gameRunningStatus == 2:

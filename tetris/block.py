@@ -12,7 +12,7 @@ class Block:
                 x * BLOCKSIDEWIDTH + CANVASOFFSET, y * BLOCKSIDEWIDTH + CANVASOFFSET, fill = color, outline = "yellow")
             allCanvasBlocks.append(self.obj)
             TetrisCounter[0] += 1
-            print("create block count ----------------- ", TetrisCounter[0])
+            # print("create block count ----------------- ", TetrisCounter[0])
         else:
             self.obj = blockQueue.get()
             canvas.coords(self.obj, (x - 1) * BLOCKSIDEWIDTH + CANVASOFFSET, (y - 1) * BLOCKSIDEWIDTH + CANVASOFFSET, \

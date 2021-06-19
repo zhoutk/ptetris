@@ -173,8 +173,7 @@ class App:
 
     def rootClose(self, root):
         print("timer close.")
-        if hasattr(self.game, "tick"):
-            self.game.tick.cancel()
         opQueue.put(("quit",()))
+        dbQueue.put(("quit",()))
         time.sleep(0.3)
         root.quit()
